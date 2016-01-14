@@ -1,8 +1,8 @@
-package ss.qwirkle.client;
+package ss.qwirkle.client.tiles;
 
-public class ShapePattern implements Pattern {
+public class ColorPattern implements Pattern {
 	
-	public ShapePattern() {
+	public ColorPattern() {
 		
 	}
 
@@ -35,5 +35,6 @@ public class ShapePattern implements Pattern {
 		// TODO Auto-generated method stub
 		
 	}
+	
 
 }

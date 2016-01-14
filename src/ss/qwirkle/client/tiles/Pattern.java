@@ -1,4 +1,4 @@
-package ss.qwirkle.client;
+package ss.qwirkle.client.tiles;
 
 public interface Pattern {
 	

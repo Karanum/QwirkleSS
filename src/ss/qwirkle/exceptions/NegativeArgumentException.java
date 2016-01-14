@@ -6,6 +6,8 @@ package ss.qwirkle.exceptions;
  */
 public class NegativeArgumentException extends Exception {
 
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	public String getMessage() {
 		return "ERROR: A negative parameter was passed where this was not permitted";
