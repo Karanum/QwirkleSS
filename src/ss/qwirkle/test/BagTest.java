@@ -37,7 +37,7 @@ public class BagTest {
 	}
 	
 	@Test
-	public void returnTiles() {
+	public void testReturnTiles() {
 		List<Tile> tiles = new ArrayList<Tile>();
 		for (int i = 0; i < 4; ++i) {
 			tiles.add(new Tile(Color.RED, Shape.CIRCLE));
