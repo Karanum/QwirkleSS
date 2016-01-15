@@ -1,5 +1,4 @@
 package ss.qwirkle.client.ui;
 
-public interface UI {
-	public void readInput();
+public interface UI extends Runnable {
 }

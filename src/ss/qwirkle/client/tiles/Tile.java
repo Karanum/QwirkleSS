@@ -2,8 +2,8 @@ package ss.qwirkle.client.tiles;
 
 public class Tile {
 	
-	private Pattern vert_pattern;
-	private Pattern horz_pattern;
+	private Pattern vertPattern;
+	private Pattern horzPattern;
 	
 	public boolean equals(Tile tile) {
 		return false;

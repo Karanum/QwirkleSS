@@ -20,7 +20,7 @@ public class SocketPlayer extends Player {
 	 */
 	@Override
 	public void determineMove() {
-		
+		//TODO: Create function body
 	}
 	
 }
