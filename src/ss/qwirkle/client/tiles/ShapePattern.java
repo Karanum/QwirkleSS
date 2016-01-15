@@ -9,6 +9,11 @@ import java.util.List;
  */
 public class ShapePattern implements Pattern {
 	
+	//TODO: Needs to have its JML updated once finished
+	
+	//@ private invariant colors != null;
+	//@ private invariant shape != null;
+	//@ private invariant tiles != null;
 	private List<Color> colors;
 	private Shape shape;
 	private List<Tile> tiles;
@@ -17,20 +22,28 @@ public class ShapePattern implements Pattern {
 	 * Creates a ShapePattern object.
 	 * It consists of tiles with the same shape
 	 * but different colors.
+	 * @param Shape The symbol of the pattern
 	 */
+	//@ requires shape != null;
 	public ShapePattern(Shape shape) {
 		this.shape = shape;
 		colors = new ArrayList<Color>();
 		tiles = new ArrayList<Tile>();
 	}
 	
+	/**
+	 * Returns the list of colors currently present in the pattern.
+	 */
+	//@ pure
 	public List<Color> getColors() {
 		return colors;
 	}
+	
 	/**
 	 * Returns if a pattern can merge.
 	 */
 	//@ requires pattern != null;
+	//@ ensures pattern instanceof ShapePattern ==> !\result;
 	@Override
 	public boolean canMerge(Pattern pattern) {
 		boolean result = false;
@@ -43,6 +56,7 @@ public class ShapePattern implements Pattern {
 		}
 		return result;
 	}
+	
 	/**
 	 * Returns if a tile can be added to the pattern.
 	 */
@@ -51,9 +65,10 @@ public class ShapePattern implements Pattern {
 	public boolean canAdd(Tile tile) {
 		return !colors.contains(tile.getColor());
 	}
+	
 	/**
 	 * Merges a ShapePattern with another ShapePattern.
-	 * @param pattern the pattern to be merged.
+	 * @param pattern The pattern to be merged.
 	 */
 	//@ requires pattern != null;
 	@Override
@@ -76,6 +91,7 @@ public class ShapePattern implements Pattern {
 		}
 		
 	}
+	
 	/**
 	 * Add a tile to a ShapePattern.
 	 */
@@ -86,6 +102,7 @@ public class ShapePattern implements Pattern {
 		colors.add(tile.getColor());
 		
 	}
+	
 	/**
 	 * Returns the points rewarded with this pattern.
 	 */
@@ -97,6 +114,11 @@ public class ShapePattern implements Pattern {
 		}
 		return points;
 	}
+	
+	/**
+	 * Returns the list of tiles included in this pattern.
+	 */
+	//@ pure
 	public List<Tile> getTiles() {
 		return tiles;
 	}

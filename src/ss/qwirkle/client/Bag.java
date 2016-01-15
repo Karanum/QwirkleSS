@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import ss.qwirkle.client.tiles.Color;
+import ss.qwirkle.client.tiles.Shape;
 import ss.qwirkle.client.tiles.Tile;
 import ss.qwirkle.client.player.Player;
 
@@ -16,6 +18,7 @@ public class Bag {
 	public static final int TILE_COPIES = 3;
 	
 	//@ private invariant bag != null;
+	//@ private invariant rand != null;
 	private List<Tile> bag;
 	private Random rand;
 	
@@ -25,7 +28,13 @@ public class Bag {
 	public Bag() {
 		bag = new ArrayList<Tile>();
 		rand = new Random();
-		//TODO: Make the Bag create all tiles
+		for (Color color : Color.values()) {
+			for (Shape shape : Shape.values()) {
+				for (int i = 0; i < TILE_COPIES; ++i) {
+					bag.add(new Tile(color, shape));
+				}
+			}
+		}
 		shuffle();
 	}
 	
@@ -38,7 +47,6 @@ public class Bag {
 	//@ ensures \result.size() == amount;
 	//@ ensures getSize() == (amount >= getSize() ? \old(getSize()) - amount : 0);
 	public List<Tile> getTiles(int amount) {
-		assert amount <=  Player.MAX_HAND_SIZE;
 		List<Tile> tiles = new ArrayList<Tile>();
 		for (int i = 0; i < amount && getSize() > 0; ++i) {
 			int randInt = rand.nextInt(getSize());

@@ -9,6 +9,11 @@ import java.util.List;
  */
 public class ColorPattern implements Pattern {
 	
+	//TODO: Needs to have its JML updated once finished
+	
+	//@ private invariant shapes != null;
+	//@ private invariant color != null;
+	//@ private invariant tiles != null;
 	private List<Shape> shapes;
 	private Color color;
 	private List<Tile> tiles;
@@ -17,19 +22,28 @@ public class ColorPattern implements Pattern {
 	 * Creates a CollorPattern object.
 	 * It consists of tiles with the same color
 	 * but different shapes.
+	 * @param color The color of the pattern
 	 */
+	//@ requires color != null;
 	public ColorPattern(Color color) {
 		this.color = color;
 		shapes = new ArrayList<Shape>();
 		tiles = new ArrayList<Tile>();
 	}
+	
+	/**
+	 * Returns the list of shapes currently present in the pattern.
+	 */
+	//@ pure
 	public List<Shape> getShape() {
 		return shapes;
 	}
+	
 	/**
 	 * Returns if a pattern can merge.
 	 */
 	//@ requires pattern != null;
+	//@ pure
 	@Override
 	public boolean canMerge(Pattern pattern) {
 		boolean result = false;
@@ -42,18 +56,21 @@ public class ColorPattern implements Pattern {
 		}
 		return result;
 	}
+	
 	/**
 	 * Returns if a tile can be added to the pattern.
 	 */
 	//@ requires tile != null;
+	//@ pure
 	@Override
 	public boolean canAdd(Tile tile) {
 		return !shapes.contains(tile.getShape());
 
 	}
+	
 	/**
-	 * Merges a ColorPattern with another ColorPattern.
-	 * @param pattern the pattern to be merged.
+	 * Merges the pattern with another ColorPattern.
+	 * @param pattern The pattern to be merged
 	 */
 	//@ requires pattern != null;	
 	@Override
@@ -76,8 +93,9 @@ public class ColorPattern implements Pattern {
 		}
 		
 	}
+	
 	/**
-	 * Add a tile to ColorPattern.
+	 * Adds a tile to ColorPattern.
 	 */
 	//@ requires tile != null;
 	@Override
@@ -85,9 +103,11 @@ public class ColorPattern implements Pattern {
 		tiles.add(tile);
 		shapes.add(tile.getShape());
 	}
+	
 	/**
-	 * Returns the points rewarded with this pattern.
+	 * Returns the points rewarded by this pattern.
 	 */
+	//@ pure
 	@Override
 	public int getPoints() {
 		int points = shapes.size();
@@ -97,6 +117,11 @@ public class ColorPattern implements Pattern {
 		return points;
 		
 	}
+	
+	/**
+	 * Returns a list of tiles contained by this pattern.
+	 */
+	//@ pure
 	public List<Tile> getTiles() {
 		return tiles;
 	}

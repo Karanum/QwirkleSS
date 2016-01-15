@@ -9,28 +9,31 @@ import java.util.List;
 public interface Pattern {
 	
 	/**
-	 * returns if a patterns can merge.
-	 * @param pattern the pattern to be merged.
+	 * Returns if the pattern can merge with another pattern.
+	 * @param pattern The pattern to be merged
 	 */
 	//@ requires pattern != null;
+	//@ pure
 	public boolean canMerge(Pattern pattern);
 	
 	/**
 	 * Returns if a tile can be added to the pattern.
-	 * @param tile the tile to be added.
+	 * @param tile The tile to be added
 	 */
 	//@ requires tile != null;
-	public boolean canAdd (Tile tile);
+	//@ pure
+	public boolean canAdd(Tile tile);
 	
 	/**
-	 * Merges a pattern with another pattern.
-	 * @param pattern the pattern to be merged.
+	 * Merges the pattern with another pattern.
+	 * @param pattern The pattern to be merged
 	 */
 	//@ requires pattern != null;
-	public void merge (Pattern pattern);
+	public void merge(Pattern pattern);
 	
 	/**
-	 * Add a tile to the pattern.
+	 * Adds a tile to the pattern.
+	 * @param tile The tile to be added
 	 */
 	//@ requires tile != null;
 	public void add(Tile tile);
@@ -38,8 +41,13 @@ public interface Pattern {
 	/**
 	 * Returns the points rewarded with this pattern.
 	 */
+	//@ pure
 	public int getPoints();
 	
+	/**
+	 * Returns a list of tiles contained in this pattern.
+	 */
+	//@ pure
 	public List<Tile> getTiles();
 
 }
