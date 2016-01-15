@@ -1,8 +1,17 @@
 package ss.qwirkle.client;
 
+import java.util.Map;
+
+import ss.qwirkle.client.tiles.Tile;
+
+/**
+ * The board of the game Quirkle.
+ * @author Dylan
+ */
 public class Board {
 	
-	private Board board;
+	//@ requires board != null;
+	private Map<Integer, Map <Integer, Tile>> board;
 	
 	/** 
 	 * creates a new board.
@@ -14,6 +23,7 @@ public class Board {
 	 * makes a move on the Board.
 	 * @param move the move you want to do.
 	 */
+	//@ requires move != null;
 	public void doMove(Move move) {
 		
 	}
