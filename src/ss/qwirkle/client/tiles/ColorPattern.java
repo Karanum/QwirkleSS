@@ -1,5 +1,6 @@
 package ss.qwirkle.client.tiles;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,6 +10,8 @@ import java.util.List;
 public class ColorPattern implements Pattern {
 	
 	private List<Shape> shapes;
+	private Color color;
+	private List<Tile> tiles;
 	
 	/**
 	 * Creates a CollorPattern object.
@@ -16,7 +19,12 @@ public class ColorPattern implements Pattern {
 	 * but different shapes.
 	 */
 	public ColorPattern(Color color) {
-		
+		this.color = color;
+		shapes = new ArrayList<Shape>();
+		tiles = new ArrayList<Tile>();
+	}
+	public List<Shape> getShape() {
+		return shapes;
 	}
 	/**
 	 * Returns if a pattern can merge.
@@ -24,8 +32,15 @@ public class ColorPattern implements Pattern {
 	//@ requires pattern != null;
 	@Override
 	public boolean canMerge(Pattern pattern) {
-		// TODO Auto-generated method stub
-		return false;
+		boolean result = false;
+		if (pattern instanceof ColorPattern) {
+			result = true;
+			List<Shape> otherShapes = ((ColorPattern) pattern).getShape();
+			for (Shape shape : otherShapes) {
+				result = result && !shapes.contains(shape);
+			}
+		}
+		return result;
 	}
 	/**
 	 * Returns if a tile can be added to the pattern.
@@ -33,8 +48,8 @@ public class ColorPattern implements Pattern {
 	//@ requires tile != null;
 	@Override
 	public boolean canAdd(Tile tile) {
-		// TODO Auto-generated method stub
-		return false;
+		return !shapes.contains(tile.getShape());
+
 	}
 	/**
 	 * Merges a ColorPattern with another ColorPattern.
@@ -43,7 +58,22 @@ public class ColorPattern implements Pattern {
 	//@ requires pattern != null;	
 	@Override
 	public void merge(Pattern pattern) {
-		// TODO Auto-generated method stub
+		if (canMerge(pattern)) {
+			List<Tile> otherTiles = pattern.getTiles();
+			Pattern horzPattern = otherTiles.get(0).getHorzPattern();
+			boolean isHorz = false;
+			if (horzPattern != null && horzPattern.equals(pattern)) {
+				isHorz = true;
+			}
+			for (Tile tile : otherTiles) {
+				add(tile);
+				if (isHorz) {
+					tile.setHorzPattern(this);
+				} else {
+					tile.setVertPattern(this);
+				}
+			}
+		}
 		
 	}
 	/**
@@ -52,16 +82,19 @@ public class ColorPattern implements Pattern {
 	//@ requires tile != null;
 	@Override
 	public void add(Tile tile) {
-		// TODO Auto-generated method stub
-		
+		tiles.add(tile);
+		shapes.add(tile.getShape());
 	}
 	/**
 	 * Returns the points rewarded with this pattern.
 	 */
 	@Override
 	public int getPoints() {
-		return 0;
-		// TODO Auto-generated method stub
+		int points = shapes.size();
+		if (shapes.size() == Shape.values().length) {
+			points *= 2;
+		}
+		return points;
 		
 	}
 	public List<Tile> getTiles() {
