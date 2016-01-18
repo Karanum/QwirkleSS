@@ -20,14 +20,14 @@ public interface Pattern {
 	 * @param tile the tile to be added.
 	 */
 	//@ requires tile != null;
-	public boolean canAdd (Tile tile);
+	public boolean canAdd(Tile tile);
 	
 	/**
 	 * Merges a pattern with another pattern.
 	 * @param pattern the pattern to be merged.
 	 */
 	//@ requires pattern != null;
-	public void merge (Pattern pattern);
+	public void merge(Pattern pattern);
 	
 	/**
 	 * Add a tile to the pattern.

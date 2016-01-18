@@ -35,10 +35,13 @@ public class ShapePattern implements Pattern {
 	public boolean canMerge(Pattern pattern) {
 		boolean result = false;
 		if (pattern instanceof ShapePattern) {
-			result = true;
-			List<Color> otherColors = ((ShapePattern) pattern).getColors();
-			for (Color color : otherColors) {
-				result = result && !colors.contains(color);
+			ShapePattern sPattern = (ShapePattern) pattern;
+			if (sPattern.getShape() == shape) {
+				result = true;
+				List<Color> otherColors = ((ShapePattern) pattern).getColors();
+				for (Color color : otherColors) {
+					result = result && !colors.contains(color);
+				}
 			}
 		}
 		return result;
@@ -49,7 +52,7 @@ public class ShapePattern implements Pattern {
 	//@ requires tile != null;
 	@Override
 	public boolean canAdd(Tile tile) {
-		return !colors.contains(tile.getColor());
+		return !colors.contains(tile.getColor()) && tile.getShape() == shape;
 	}
 	/**
 	 * Merges a ShapePattern with another ShapePattern.
@@ -99,6 +102,9 @@ public class ShapePattern implements Pattern {
 	}
 	public List<Tile> getTiles() {
 		return tiles;
+	}
+	public Shape getShape() {
+		return shape;
 	}
 
 }
