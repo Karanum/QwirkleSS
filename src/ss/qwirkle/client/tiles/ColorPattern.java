@@ -38,7 +38,12 @@ public class ColorPattern implements Pattern {
 	public List<Shape> getShape() {
 		return shapes;
 	}
-	
+
+	//@ pure
+	public Color getColor() {
+		return color;
+	}
+
 	/**
 	 * Returns if a pattern can merge.
 	 */
@@ -48,10 +53,13 @@ public class ColorPattern implements Pattern {
 	public boolean canMerge(Pattern pattern) {
 		boolean result = false;
 		if (pattern instanceof ColorPattern) {
-			result = true;
-			List<Shape> otherShapes = ((ColorPattern) pattern).getShape();
-			for (Shape shape : otherShapes) {
-				result = result && !shapes.contains(shape);
+			ColorPattern cPattern = (ColorPattern) pattern;
+			if (cPattern.getColor() == color) {
+				result = true;
+				List<Shape> otherShapes = cPattern.getShapes();
+				for (Shape shape : otherShapes) {
+					result = result && !shapes.contains(shape);
+				}
 			}
 		}
 		return result;
@@ -64,7 +72,7 @@ public class ColorPattern implements Pattern {
 	//@ pure
 	@Override
 	public boolean canAdd(Tile tile) {
-		return !shapes.contains(tile.getShape());
+		return !shapes.contains(tile.getShape()) && tile.getColor() == color;
 
 	}
 	

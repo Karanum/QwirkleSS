@@ -38,7 +38,7 @@ public class Tile implements Comparable<Tile> {
 	//@ ensures \result == (getColor() == tile.getColor() && getShape() == tile.getShape());
 	//@ pure
 	public boolean equals(Tile tile) {
-		return false;
+		return tile.getShape() == shape && tile.getColor() == color;
 	}
 	
 	/**
