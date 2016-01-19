@@ -85,7 +85,7 @@ public class ColorPattern implements Pattern {
 	public void merge(Pattern pattern) {
 		if (canMerge(pattern)) {
 			List<Tile> otherTiles = pattern.getTiles();
-			Pattern horzPattern = otherTiles.get(0).getHorzPattern();
+			Pattern horzPattern = otherTiles.get(0).getHorzPattern().orElse(null);
 			boolean isHorz = false;
 			if (horzPattern != null && horzPattern.equals(pattern)) {
 				isHorz = true;

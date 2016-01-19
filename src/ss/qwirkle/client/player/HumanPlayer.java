@@ -45,7 +45,7 @@ public class HumanPlayer extends Player {
 			return false;
 		}
 		Tile tile = hand.get(handIndex);
-		//TODO: Add tile to move
+		move.addTile(tile, x, y);
 		return true;
 	}
 	

@@ -8,6 +8,8 @@ import ss.qwirkle.client.tiles.Tile;
 /**
  * Object representing a move done by the player.
  * @author Dylan
+ * 
+ * TODO: Add checks for move validity when adding tiles
  */
 public class Move {
 	
@@ -15,6 +17,10 @@ public class Move {
 	//@private invariant tiles != null;
 	private int points;
 	private Map<Integer, Map<Integer, Tile>> tiles;
+	
+	public enum MoveType {
+		VERTICAL, HORIZONTAL, SINGULAR;
+	}
 	
 	/**
 	 * Creates an empty move object.
@@ -40,6 +46,22 @@ public class Move {
 	
 	public Map<Integer, Map<Integer, Tile>> getTiles() {
 		return tiles;
+	}
+	
+	public MoveType getType() {
+		if (tiles.size() == 0) {
+			return MoveType.SINGULAR;
+		}
+		if (tiles.size() > 1) {
+			return MoveType.VERTICAL;
+		} else {
+			Integer y = tiles.keySet().iterator().next();
+			if (tiles.get(y).size() > 1) {
+				return MoveType.HORIZONTAL;
+			} else {
+				return MoveType.SINGULAR;
+			}
+		}
 	}
 
 }
