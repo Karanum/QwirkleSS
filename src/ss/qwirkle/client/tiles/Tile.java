@@ -1,5 +1,7 @@
 package ss.qwirkle.client.tiles;
 
+import java.util.Optional;
+
 /**
  * @author Dylan
  * 
@@ -14,6 +16,8 @@ public class Tile implements Comparable<Tile> {
 	private Pattern horzPattern;
 	private Color color;
 	private Shape shape;
+	private int x;
+	private int y;
 	
 	/**
 	 * Creates a tile object.
@@ -23,11 +27,15 @@ public class Tile implements Comparable<Tile> {
 	 */
 	//@ requires color != null;
 	//@ requires shape != null;
+	//@ ensures getColor() == color;
+	//@ ensures getShape() == shape;
 	public Tile(Color color, Shape shape) {
 		this.color = color;
 		this.shape = shape;
 		vertPattern = null;
 		horzPattern = null;
+		x = 0;
+		y = 0;
 	}
 	
 	/**
@@ -61,16 +69,16 @@ public class Tile implements Comparable<Tile> {
 	 * Returns the horizontal pattern the tile is part of, or null.
 	 */
 	//@ pure
-	public Pattern getHorzPattern() {
-		return horzPattern;
+	public Optional<Pattern> getHorzPattern() {
+		return horzPattern == null ? Optional.empty() : Optional.of(horzPattern);
 	}
 	
 	/**
 	 * Returns the vertical pattern the tile is part of, or null.
 	 */
 	//@ pure
-	public Pattern getVertPattern() {
-		return vertPattern;
+	public Optional<Pattern> getVertPattern() {
+		return vertPattern == null ? Optional.empty() : Optional.of(vertPattern);
 	}
 	
 	/**
@@ -91,6 +99,22 @@ public class Tile implements Comparable<Tile> {
 	//@ ensures getVertPattern() == p;
 	public void setVertPattern(Pattern p) {
 		vertPattern = p;
+	}
+	
+	public int getX() {
+		return x;
+	}
+	
+	public int getY() {
+		return y;
+	}
+	
+	public void setX(int x) {
+		this.x = x;
+	}
+	
+	public void setY(int y) {
+		this.y = y;
 	}
 	
 	/**

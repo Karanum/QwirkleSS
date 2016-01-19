@@ -1,13 +1,13 @@
 package ss.qwirkle.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import ss.qwirkle.client.tiles.Color;
 import ss.qwirkle.client.tiles.Shape;
 import ss.qwirkle.client.tiles.Tile;
-import ss.qwirkle.client.player.Player;
 
 /**
  * Container class for tiles that are not on the board or in a player's hand.
@@ -35,7 +35,7 @@ public class Bag {
 				}
 			}
 		}
-		shuffle();
+		Collections.shuffle(bag, rand);
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public class Bag {
 	//@ ensures getSize() == \old(getSize()) + tiles.size();
 	public void returnTiles(List<Tile> tiles) {
 		bag.addAll(tiles);
-		shuffle();
+		Collections.shuffle(bag, rand);
 	}
 	
 	/**
@@ -73,20 +73,6 @@ public class Bag {
 	//@ pure
 	public int getSize() {
 		return bag.size();
-	}
-	
-	/**
-	 * Shuffles the contents of the bag at random.
-	 */
-	//@ ensures \old(getSize()) == getSize();
-	private void shuffle() {
-		List<Tile> result = new ArrayList<Tile>();
-		while (getSize() > 0) {
-			int randInt = rand.nextInt(getSize());
-			Tile tile = bag.remove(randInt);
-			result.add(tile);
-		}
-		bag = result;
 	}
 	
 }
