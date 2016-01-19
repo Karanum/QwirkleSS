@@ -35,7 +35,7 @@ public class ColorPattern implements Pattern {
 	 * Returns the list of shapes currently present in the pattern.
 	 */
 	//@ pure
-	public List<Shape> getShape() {
+	public List<Shape> getShapes() {
 		return shapes;
 	}
 
