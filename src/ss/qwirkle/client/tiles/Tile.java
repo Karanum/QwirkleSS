@@ -4,7 +4,7 @@ package ss.qwirkle.client.tiles;
  * @author Dylan
  * 
  */
-public class Tile {
+public class Tile implements Comparable<Tile> {
 	
 	//@ private invariant vertPattern != null;
 	//@ private invariant horzPattern != null;
@@ -91,6 +91,30 @@ public class Tile {
 	//@ ensures getVertPattern() == p;
 	public void setVertPattern(Pattern p) {
 		vertPattern = p;
+	}
+	
+	/**
+	 * Converts the tile to an integer for sorting or communication purposes.
+	 */
+	//@ pure
+	public int toInt() {
+		return color.toInt() * 6 + shape.toInt();
+	}
+
+	/**
+	 * Compares the tile with another tile based on their integer values.
+	 */
+	@Override
+	public int compareTo(Tile tile) {
+		int ownValue = toInt();
+		int otherValue = tile.toInt();
+		if (ownValue < otherValue) {
+			return -1;
+		} else if (ownValue > otherValue) {
+			return 1;
+		} else {
+			return 0;
+		}
 	}
 
 }

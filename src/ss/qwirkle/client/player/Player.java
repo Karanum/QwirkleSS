@@ -1,5 +1,6 @@
 package ss.qwirkle.client.player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ss.qwirkle.client.Move;
@@ -38,6 +39,8 @@ public abstract class Player {
 	public Player(String name) {
 		this.name = name;
 		score = 0;
+		hand = new ArrayList<Tile>();
+		moveLog = new ArrayList<Move>();
 	}
 	
 	/**
@@ -75,6 +78,14 @@ public abstract class Player {
 	//@ pure
 	public int getHandSize() {
 		return hand.size();
+	}
+	
+	/**
+	 * Returns the contents of the player's hand.
+	 */
+	//@ pure
+	public List<Tile> getHand() {
+		return hand;
 	}
 	
 	/**
