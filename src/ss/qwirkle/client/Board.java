@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import ss.qwirkle.client.Move.MoveType;
+import ss.qwirkle.client.tiles.Pattern;
 import ss.qwirkle.client.tiles.Tile;
 import ss.qwirkle.exceptions.InvalidMoveException;
 
@@ -143,9 +144,89 @@ public class Board {
 	}
 	
 	private boolean performPatternChecks(List<Tile> tiles, MoveType moveType) {
+		Integer minPos = null;
+		Integer maxPos = null;
 		for (Tile tile : tiles) {
-			
+			if (!performPatternCheck(tile)) {
+				return false;
+			}
+			if (moveType == MoveType.HORIZONTAL) {
+				if (minPos == null || minPos > tile.getX()) {
+					minPos = tile.getX();
+				}
+				if (maxPos == null || maxPos < tile.getX()) {
+					maxPos = tile.getX();
+				}
+			} else if (moveType == MoveType.VERTICAL) {
+				if (minPos == null || minPos > tile.getY()) {
+					minPos = tile.getY();
+				}
+				if (maxPos == null || maxPos < tile.getY()) {
+					maxPos = tile.getY();
+				}
+			}
+		}
+		
+		if (moveType == MoveType.HORIZONTAL) {
+			Tile tileLeft = getTile(minPos - 1, tiles.get(0).getY()).orElse(null);
+			Tile tileRight = getTile(maxPos + 1, tiles.get(0).getY()).orElse(null);
+			Pattern patternLeft = 
+							tileLeft != null ? tileLeft.getHorzPattern().orElse(null) : null;
+			Pattern patternRight =
+							tileRight != null ? tileRight.getHorzPattern().orElse(null) : null;
+		}
+		return true;
+	}
+	
+	private boolean performPatternCheck(Tile tile) {
+		int x = tile.getX();
+		int y = tile.getY();
+		Tile tileUp = getTile(x, y - 1).orElse(null);
+		Tile tileDown = getTile(x, y + 1).orElse(null);
+		Tile tileLeft = getTile(x - 1, y).orElse(null);
+		Tile tileRight = getTile(x + 1, y).orElse(null);
+		
+		if (tileUp != null || tileDown != null) {
+			Pattern patternUp =
+							tileUp != null ? tileUp.getVertPattern().orElse(null) : null;
+			Pattern patternDown =
+							tileDown != null ? tileDown.getVertPattern().orElse(null) : null;
+			if (!checkPatterns(patternUp, patternDown, tileUp, tileDown, tile)) {
+				return false;
+			}
+		}
+		if (tileLeft != null || tileRight != null) {
+			Pattern patternLeft =
+							tileLeft != null ? tileLeft.getHorzPattern().orElse(null) : null;
+			Pattern patternRight =
+							tileRight != null ? tileRight.getHorzPattern().orElse(null) : null;
+			if (!checkPatterns(patternLeft, patternRight, tileLeft, tileRight, tile)) {
+				return false;
+			}
 		}
 		return false;
+	}
+	
+	private boolean checkPatterns(Pattern p1, Pattern p2, Tile tile1, Tile tile2, Tile self) {
+		if (p1 != null && p2 != null && !p1.canMerge(p2)) {
+			return false;
+		}
+		if (p1 != null) {
+			if (p2 == null && tile2 != null && !p1.canAdd(tile2)) {
+				return false;
+			}
+			if (!p1.canAdd(self)) {
+				return false;
+			}
+		}
+		if (p2 != null) {
+			if (p1 == null && tile1 != null && !p2.canAdd(tile1)) {
+				return false;
+			}
+			if (!p2.canAdd(self)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
