@@ -28,7 +28,7 @@ public class AIPlayer extends Player {
 	 */
 	@Override
 	public void determineMove() {
-		behaviour.determineMove();
+		//behaviour.determineMove();
 		//TODO: Create function body
 	}
 	

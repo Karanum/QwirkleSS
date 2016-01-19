@@ -32,7 +32,7 @@ public class Tile {
 	 */
 	//@ requires tile != null;
 	public boolean equals(Tile tile) {
-		return false;
+		return tile.getShape() == shape && tile.getColor() == color;
 	}
 	public Color getColor() {
 		return color;
