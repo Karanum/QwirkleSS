@@ -13,17 +13,12 @@ public class BasicBehaviour implements Behaviour {
 
 	@Override
 	public Move determineMove(Board b, List<Tile> hand) {
-		//for loop with possibleLocations
-		//for loop with possibleMoves
-		//check if move can be done at tile.
-		//if can be done return move and result = true;
-		//else remove tile from possibleMoves
 		List<Tile> myTiles = new ArrayList<Tile>(hand);
 		Random r = new Random();
 		Move move = new Move();
 		Collections.shuffle(myTiles, r);
-		List<Tile> possibleTiles = 
-		Collections.shuffle(possibleTiles r);
+		List<Tile> possibleTiles = b.flattenBoard();
+		Collections.shuffle(possibleTiles, r);
 		boolean result = false;
 		while (!result) {
 			for (Tile boardTile : possibleTiles) {
@@ -31,32 +26,33 @@ public class BasicBehaviour implements Behaviour {
 				int y = boardTile.getY();
 				for (Tile tile : myTiles) {
 					if (!result && !b.hasTile(x + 1, y)) {
-						for (Tile tile : myTiles) {
-							//positie waar geen tile ligt.
-							if (b.canPlaceTile(tile, x, y)) {
-								result = true;
+						if (b.canPlaceTile(tile, x + 1, y)) {
+							result = true;
+							move.addTile(tile, x + 1, y);
+						}
 					}
 					if (!result && !b.hasTile(x - 1, y)) {
-						for (Tile tile : myTiles) {
-							//positie waar geen tile ligt.
-							if (b.canPlaceTile(tile, x, y)) {
-								result = true;
-					}
-					if (!result && b.hasTile(x, y + 1)) {
-						for (Tile tile : myTiles) {
-							//positie waar geen tile ligt.
-							if (b.canPlaceTile(tile, x, y)) {
-								result = true;
+						if (b.canPlaceTile(tile, x - 1, y)) {
+							result = true;
+							move.addTile(tile, x - 1, y);
+						}
+					}	
+					if (!result && b.hasTile(x, y - 1)) {
+						if (b.canPlaceTile(tile, x, y - 1)) {
+							result = true;	
+							move.addTile(tile, x, y - 1);
+						}
 					}
 					if (!result && !b.hasTile(x, y + 1)) {
-						for (Tile tile : myTiles) {
-							//positie waar geen tile ligt.
-							if (b.canPlaceTile(tile, x, y)) {
-								result = true;
-								
-					} else { myTiles.remove(tile);
-				}
-			}	
+						if (b.canPlaceTile(tile, x, y + 1)) {
+							result = true;
+							move.addTile(tile, x, y + 1);
+						}
+					} else { 
+						myTiles.remove(tile);
+					}
+				}	
+			}
 		}
 		return move;
 	}
