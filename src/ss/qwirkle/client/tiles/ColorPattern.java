@@ -31,6 +31,14 @@ public class ColorPattern implements Pattern {
 		tiles = new ArrayList<Tile>();
 	}
 	
+	public ColorPattern copy() {
+		ColorPattern copy = new ColorPattern(color);
+		for (Tile tile : tiles) {
+			copy.add(new Tile(tile, false));
+		}
+		return copy;
+	}
+	
 	/**
 	 * Returns the list of shapes currently present in the pattern.
 	 */

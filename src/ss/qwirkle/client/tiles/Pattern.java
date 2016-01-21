@@ -8,6 +8,8 @@ import java.util.List;
  */
 public interface Pattern {
 	
+	public Pattern copy();
+	
 	/**
 	 * Returns if the pattern can merge with another pattern.
 	 * @param pattern The pattern to be merged

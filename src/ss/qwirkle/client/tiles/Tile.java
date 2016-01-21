@@ -18,6 +18,7 @@ public class Tile implements Comparable<Tile> {
 	private Shape shape;
 	private int x;
 	private int y;
+	private int moveId;
 	
 	/**
 	 * Creates a tile object.
@@ -36,6 +37,25 @@ public class Tile implements Comparable<Tile> {
 		horzPattern = null;
 		x = 0;
 		y = 0;
+		moveId = -1;
+	}
+	
+	public Tile(Tile tile, boolean copyPatterns) {
+		color = tile.getColor();
+		shape = tile.getShape();
+		vertPattern = tile.getVertPattern().orElse(null);
+		horzPattern = tile.getHorzPattern().orElse(null);
+		if (copyPatterns) {
+			if (vertPattern != null) {
+				vertPattern = vertPattern.copy();
+			}
+			if (horzPattern != null) {
+				horzPattern = horzPattern.copy();
+			}
+		}
+		x = tile.getX();
+		y = tile.getY();
+		moveId = tile.getMoveId();
 	}
 	
 	/**
@@ -47,6 +67,14 @@ public class Tile implements Comparable<Tile> {
 	//@ pure
 	public boolean equals(Tile tile) {
 		return tile.getShape() == shape && tile.getColor() == color;
+	}
+	
+	public int getMoveId() {
+		return moveId;
+	}
+	
+	public void setMoveId(int id) {
+		moveId = id;
 	}
 	
 	/**
@@ -139,6 +167,23 @@ public class Tile implements Comparable<Tile> {
 		} else {
 			return 0;
 		}
+	}
+	
+	public Optional<Pattern> makePatternWith(Tile tile) {
+		Optional<Pattern> result = Optional.empty();
+		if (color == tile.getColor() && shape != tile.getShape()) {
+			ColorPattern p = new ColorPattern(color);
+			p.add(tile);
+			p.add(this);
+			result = Optional.of(p);
+		}
+		if (shape == tile.getShape() && color != tile.getColor()) {
+			ShapePattern p = new ShapePattern(shape);
+			p.add(tile);
+			p.add(this);
+			result = Optional.of(p);
+		}
+		return result;
 	}
 
 }

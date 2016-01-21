@@ -31,6 +31,15 @@ public class ShapePattern implements Pattern {
 		tiles = new ArrayList<Tile>();
 	}
 	
+	@Override
+	public ShapePattern copy() {
+		ShapePattern copy = new ShapePattern(shape);
+		for (Tile tile : tiles) {
+			copy.add(new Tile(tile, false));
+		}
+		return copy;
+	}
+	
 	/**
 	 * Returns the list of colors currently present in the pattern.
 	 */

@@ -2,14 +2,18 @@ package ss.qwirkle.client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import ss.qwirkle.client.Move.MoveType;
+import ss.qwirkle.client.tiles.Color;
 import ss.qwirkle.client.tiles.Pattern;
+import ss.qwirkle.client.tiles.Shape;
 import ss.qwirkle.client.tiles.Tile;
 import ss.qwirkle.exceptions.InvalidMoveException;
+import ss.qwirkle.util.Range;
 
 /**
  * The Qwirkle game board.
@@ -20,7 +24,6 @@ public class Board {
 	//@ private invariant board != null;
 	//@ private invariant (\forall Integer i; board.containsKey(i); board.get(i) != null);
 	private Map<Integer, Map<Integer, Tile>> board;
-	private Map<Integer, Map<Integer, Tile>> boardCopy;
 	
 	/** 
 	 * Creates a new board.
@@ -28,40 +31,10 @@ public class Board {
 	public Board() {
 		board = new HashMap<Integer, Map<Integer, Tile>>();
 	}
-
-//	public boolean checkForFreePlace(Move move) {
-//		Map<Integer, Map<Integer, Tile>> boardCopy = new HashMap<Integer, Map<Integer, Tile>>();
-//		for (Integer key : board.keySet()) {
-//			Map<Integer, Tile> values = new HashMap<Integer, Tile>(board.get(key));
-//			boardCopy.put(key, values);
-//		}
-//		boolean result = true;
-//		Map<Integer, Map<Integer, Tile>> tiles = move.getTiles();
-//		for (Integer y : tiles.keySet()) {
-//			for (Integer x : tiles.get(y).keySet()) {
-//				if (hasTile(x, y)) {
-//					result = false;
-//				}
-//			}
-//		}
-//		return result;
-//	}
-//	public boolean checkAddPattern(Move move) {
-//		boolean result = false;
-//		Map<Integer, Map<Integer, Tile>> tileList = move.getTiles();
-//		for (Integer y : tileList.keySet()) {
-//			Map<Integer, Tile> values = tileList.get(y);
-//			for (Integer x : values.keySet()) {
-//				Tile tile = values.get(x);
-//				Tile above = getTile(x, y + 1);
-//				Tile below = getTile(x, y - 1);
-//				Tile left = getTile(x - 1, y);
-//				Tile right = getTile(x + 1, y);
-//				
-//			}
-//		}
-//		return result;
-//	}
+	
+	public Board(Board b) {
+		this.board = b.cloneBoard();
+	}
 
 	public Optional<Tile> getTile(int x, int y) {
 		if (board.containsKey(y) && board.get(y).containsKey(x)) {
@@ -80,153 +53,139 @@ public class Board {
 		return board.containsKey(y) && board.get(y).containsKey(x);
 	}
 	
+	public boolean isEmpty() {
+		return board.keySet().size() == 0;
+	}
+	
 	/** 
 	 * Makes a move on the Board.
 	 * @param move The move that should be done
 	 */
 	//@ requires move != null;
 	public void doMove(Move move) throws InvalidMoveException {
-		boardCopy = cloneBoard();
-		Map<Integer, Map<Integer, Tile>> tileMap = move.getTiles();
-		List<Tile> tiles = placeAllTiles(tileMap);
-		if (performPatternChecks(tiles, move.getType())) {
-			//TODO: Finalize move
+		if (!BoardChecker.isMoveConnecting(this, move)) {
+			throw new InvalidMoveException();
 		}
-	}
-	
-	public boolean canPlaceTile(Tile tile, int x, int y) {
-		return false;
+		Board boardCopy = new Board(this);
+		boardCopy.placeAllTiles(move.getTileCopies());
+		placeAllTiles(move.getTiles());
 	}
 	
 	public List<Tile> flattenBoard() {
 		List<Tile> result = new ArrayList<Tile>();
 		for (Integer y : board.keySet()) {
-			Map<Integer, Tile> line = board.get(y); 
-			for (Integer x : line.keySet()) {
-				result.add(line.get(x));
-			}
+			Map<Integer, Tile> line = board.get(y);
+			result.addAll(line.values());
 		}
 		return result;
 	}
 	
-	private Map<Integer, Map<Integer, Tile>> cloneBoard() {
+	public Map<Integer, Map<Integer, Tile>> cloneBoard() {
 		Map<Integer, Map<Integer, Tile>> copy = new HashMap<Integer, Map<Integer, Tile>>();
-		for (Integer key : board.keySet()) {
-			copy.put(key, new HashMap<Integer, Tile>(board.get(key)));
+		for (Integer y : board.keySet()) {
+			copy.put(y, new HashMap<Integer, Tile>());
+			Map<Integer, Tile> line = board.get(y);
+			for (Integer x : line.keySet()) {
+				copy.get(y).put(x, new Tile(line.get(x), true));
+			}
 		}
 		return copy;
 	}
 	
-	private void placeTile(Tile tile, int x, int y) {
+	private void placeTile(Tile tile) throws InvalidMoveException {
+		int x = tile.getX();
+		int y = tile.getY();
 		if (!board.containsKey(y)) {
 			board.put(y, new HashMap<Integer, Tile>());
 		}
 		board.get(y).put(x, tile);
-		tile.setX(x);
-		tile.setY(y);
+		connectPatterns(tile, x, y);
 	}
 	
-	private List<Tile> placeAllTiles(Map<Integer, Map<Integer, Tile>> tiles)
-			throws InvalidMoveException {
-		List<Tile> result = new ArrayList<Tile>();
-		for (Integer y : tiles.keySet()) {
-			Map<Integer, Tile> line = tiles.get(y);
-			for (Integer x : line.keySet()) {
-				Tile tile = line.get(x);
-				if (hasTile(x, y)) {
-					throw new InvalidMoveException();
+	private void placeAllTiles(List<Tile> tiles) throws InvalidMoveException {
+		List<Tile> tilesCopy = new ArrayList<Tile>(tiles);
+		do {
+			boolean placedTile = false;
+			for (int i = tilesCopy.size() - 1; i >= 0; --i) {
+				Tile tile = tilesCopy.get(i);
+				if (BoardChecker.canPlaceTile(this, tile, tile.getX(), tile.getY())) {
+					placeTile(tile);
+					placedTile = true;
+					tilesCopy.remove(i);
 				}
-				placeTile(tile, x, y);
-				result.add(tile);
 			}
-		}
-		return result;
+			if (!placedTile) {
+				throw new InvalidMoveException();
+			}
+		} while (tilesCopy.size() > 0);
 	}
 	
-	private boolean performPatternChecks(List<Tile> tiles, MoveType moveType) {
-		Integer minPos = null;
-		Integer maxPos = null;
-		for (Tile tile : tiles) {
-			if (!performPatternCheck(tile)) {
-				return false;
-			}
-			if (moveType == MoveType.HORIZONTAL) {
-				if (minPos == null || minPos > tile.getX()) {
-					minPos = tile.getX();
-				}
-				if (maxPos == null || maxPos < tile.getX()) {
-					maxPos = tile.getX();
-				}
-			} else if (moveType == MoveType.VERTICAL) {
-				if (minPos == null || minPos > tile.getY()) {
-					minPos = tile.getY();
-				}
-				if (maxPos == null || maxPos < tile.getY()) {
-					maxPos = tile.getY();
-				}
-			}
-		}
-		
-		if (moveType == MoveType.HORIZONTAL) {
-			Tile tileLeft = getTile(minPos - 1, tiles.get(0).getY()).orElse(null);
-			Tile tileRight = getTile(maxPos + 1, tiles.get(0).getY()).orElse(null);
-			Pattern patternLeft = 
-							tileLeft != null ? tileLeft.getHorzPattern().orElse(null) : null;
-			Pattern patternRight =
-							tileRight != null ? tileRight.getHorzPattern().orElse(null) : null;
-		}
-		return true;
-	}
-	
-	private boolean performPatternCheck(Tile tile) {
-		int x = tile.getX();
-		int y = tile.getY();
+	private void connectPatterns(Tile tile, int x, int y) throws InvalidMoveException {
 		Tile tileUp = getTile(x, y - 1).orElse(null);
 		Tile tileDown = getTile(x, y + 1).orElse(null);
 		Tile tileLeft = getTile(x - 1, y).orElse(null);
 		Tile tileRight = getTile(x + 1, y).orElse(null);
-		
-		if (tileUp != null || tileDown != null) {
-			Pattern patternUp =
-							tileUp != null ? tileUp.getVertPattern().orElse(null) : null;
-			Pattern patternDown =
-							tileDown != null ? tileDown.getVertPattern().orElse(null) : null;
-			if (!checkPatterns(patternUp, patternDown, tileUp, tileDown, tile)) {
-				return false;
-			}
-		}
-		if (tileLeft != null || tileRight != null) {
-			Pattern patternLeft =
-							tileLeft != null ? tileLeft.getHorzPattern().orElse(null) : null;
-			Pattern patternRight =
-							tileRight != null ? tileRight.getHorzPattern().orElse(null) : null;
-			if (!checkPatterns(patternLeft, patternRight, tileLeft, tileRight, tile)) {
-				return false;
-			}
-		}
-		return false;
+		connectVertPattern(tile, tileUp);
+		connectVertPattern(tile, tileDown);
+		connectHorzPattern(tile, tileLeft);
+		connectHorzPattern(tile, tileRight);
 	}
 	
-	private boolean checkPatterns(Pattern p1, Pattern p2, Tile tile1, Tile tile2, Tile self) {
-		if (p1 != null && p2 != null && !p1.canMerge(p2)) {
-			return false;
+	private void connectVertPattern(Tile tile1, Tile tile2) throws InvalidMoveException {
+		if (tile1 == null || tile2 == null) {
+			return;
 		}
-		if (p1 != null) {
-			if (p2 == null && tile2 != null && !p1.canAdd(tile2)) {
-				return false;
+		
+		Pattern p1 = tile1.getVertPattern().orElse(null);
+		Pattern p2 = tile2.getVertPattern().orElse(null);
+		if (p1 == null) {
+			if (p2 == null) {
+				Pattern newPattern = tile1.makePatternWith(tile2).orElse(null);
+				if (newPattern == null) {
+					throw new InvalidMoveException();
+				}
+				tile1.setVertPattern(newPattern);
+				tile2.setVertPattern(newPattern);
+			} else {
+				p2.add(tile1);
+				tile1.setVertPattern(p2);
 			}
-			if (!p1.canAdd(self)) {
-				return false;
+		} else {
+			if (p2 == null) {
+				p1.add(tile2);
+				tile2.setVertPattern(p2);
+			} else if (p1 != p2) {
+				p1.merge(p2);
 			}
 		}
-		if (p2 != null) {
-			if (p1 == null && tile1 != null && !p2.canAdd(tile1)) {
-				return false;
+	}
+	
+	private void connectHorzPattern(Tile tile1, Tile tile2) throws InvalidMoveException {
+		if (tile1 == null || tile2 == null) {
+			return;
+		}
+		
+		Pattern p1 = tile1.getHorzPattern().orElse(null);
+		Pattern p2 = tile2.getHorzPattern().orElse(null);
+		if (p1 == null) {
+			if (p2 == null) {
+				Pattern newPattern = tile1.makePatternWith(tile2).orElse(null);
+				if (newPattern == null) {
+					throw new InvalidMoveException();
+				}
+				tile1.setHorzPattern(newPattern);
+				tile2.setHorzPattern(newPattern);
+			} else {
+				p2.add(tile1);
+				tile1.setHorzPattern(p2);
 			}
-			if (!p2.canAdd(self)) {
-				return false;
+		} else {
+			if (p2 == null) {
+				p1.add(tile2);
+				tile2.setHorzPattern(p2);
+			} else if (p1 != p2) {
+				p1.merge(p2);
 			}
 		}
-		return true;
 	}
 }
