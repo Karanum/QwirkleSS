@@ -1,7 +1,6 @@
 package ss.qwirkle.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -11,8 +10,6 @@ import org.junit.Test;
 import ss.qwirkle.common.Board;
 import ss.qwirkle.common.Move;
 import ss.qwirkle.common.tiles.Color;
-import ss.qwirkle.common.tiles.ColorPattern;
-import ss.qwirkle.common.tiles.Pattern;
 import ss.qwirkle.common.tiles.Shape;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.exceptions.InvalidMoveException;
@@ -29,10 +26,10 @@ public class BoardTest {
 	@Test
 	public void testCorrectStartingMove() {
 		Move m = new Move();
-		m.addTile(new Tile(Color.YELLOW, Shape.DIAMOND), 0, 0);
-		m.addTile(new Tile(Color.BLUE, Shape.DIAMOND), 1, 0);
-		assertEquals(2, m.getTiles().size());
 		try {
+			m.addTile(b, new Tile(Color.YELLOW, Shape.DIAMOND), 0, 0);
+			m.addTile(b, new Tile(Color.BLUE, Shape.DIAMOND), 1, 0);
+			assertEquals(2, m.getTiles().size());
 			b.doMove(m);
 		} catch (InvalidMoveException e) {
 			e.printStackTrace();
@@ -51,10 +48,10 @@ public class BoardTest {
 		testCorrectStartingMove();
 		
 		Move m = new Move();
-		m.addTile(new Tile(Color.BLUE, Shape.CLOVER), 1, -1);
-		m.addTile(new Tile(Color.BLUE, Shape.CROSS), 1, -2);
-		assertEquals(2, m.getTiles().size());
 		try {
+			m.addTile(b, new Tile(Color.BLUE, Shape.CLOVER), 1, -1);
+			m.addTile(b, new Tile(Color.BLUE, Shape.CROSS), 1, -2);
+			assertEquals(2, m.getTiles().size());
 			b.doMove(m);
 		} catch (InvalidMoveException e) {
 			e.printStackTrace();
@@ -65,8 +62,13 @@ public class BoardTest {
 	@Test 
 	public void testInvalidStartingMove() {
 		Move m = new Move();
-		m.addTile(new Tile(Color.RED, Shape.CIRCLE), 2, 0);
+		try {
+			m.addTile(b, new Tile(Color.RED, Shape.CIRCLE), 2, 0);
+		} catch (InvalidMoveException e) {
+			fail();
+		}
 		assertEquals(1, m.getTiles().size());
+		
 		try {
 			b.doMove(m);
 			fail();
@@ -79,8 +81,13 @@ public class BoardTest {
 		testCorrectStartingMove();
 		
 		Move m = new Move();
-		m.addTile(new Tile(Color.GREEN, Shape.DIAMOND), -1, 1);
+		try {
+			m.addTile(b, new Tile(Color.GREEN, Shape.DIAMOND), -1, 1);
+		} catch (InvalidMoveException e) {
+			fail();
+		}
 		assertEquals(1, m.getTiles().size());
+		
 		try {
 			b.doMove(m);
 			fail();
@@ -93,14 +100,18 @@ public class BoardTest {
 		Move m1 = new Move();
 		Move m2 = new Move();
 		Move m3 = new Move();
-		m1.addTile(new Tile(Color.YELLOW, Shape.STAR), 0, 0);
-		m1.addTile(new Tile(Color.PURPLE, Shape.STAR), 1, 0);
-		m2.addTile(new Tile(Color.PURPLE, Shape.CIRCLE), 1, 1);
-		m3.addTile(new Tile(Color.PURPLE, Shape.CROSS), 1, 2);
-		m3.addTile(new Tile(Color.YELLOW, Shape.CROSS), 0, 2);
-		assertEquals(2, m1.getTiles().size());
-		assertEquals(1, m2.getTiles().size());
-		assertEquals(2, m3.getTiles().size());
+		try {
+			m1.addTile(b, new Tile(Color.YELLOW, Shape.STAR), 0, 0);
+			m1.addTile(b, new Tile(Color.PURPLE, Shape.STAR), 1, 0);
+			m2.addTile(b, new Tile(Color.PURPLE, Shape.CIRCLE), 1, 1);
+			m3.addTile(b, new Tile(Color.PURPLE, Shape.CROSS), 1, 2);
+			m3.addTile(b, new Tile(Color.YELLOW, Shape.CROSS), 0, 2);
+			assertEquals(2, m1.getTiles().size());
+			assertEquals(1, m2.getTiles().size());
+			assertEquals(2, m3.getTiles().size());
+		} catch (InvalidMoveException e) {
+			fail();
+		}
 		try {
 			b.doMove(m1);
 			b.doMove(m2);
@@ -111,18 +122,23 @@ public class BoardTest {
 		}
 		
 		Move m4 = new Move();
-		m4.addTile(new Tile(Color.YELLOW, Shape.DIAMOND), 0, -1);
-		m4.addTile(new Tile(Color.YELLOW, Shape.SQUARE), 0, 3);
+		try {
+			m4.addTile(b, new Tile(Color.YELLOW, Shape.DIAMOND), 0, -1);
+			m4.addTile(b, new Tile(Color.YELLOW, Shape.SQUARE), 0, 3);
+		} catch (InvalidMoveException e) {
+			fail();
+		}
 		assertEquals(2, m4.getTiles().size());
+		
 		try {
 			b.doMove(m4);
 			fail();
 		} catch (InvalidMoveException e) {
 		}
 		
-		m4.addTile(new Tile(Color.YELLOW, Shape.CIRCLE), 0, 1);
-		assertEquals(3, m4.getTiles().size());
 		try {
+			m4.addTile(b, new Tile(Color.YELLOW, Shape.CIRCLE), 0, 1);
+			assertEquals(3, m4.getTiles().size());
 			b.doMove(m4);
 		} catch (InvalidMoveException e) {
 			e.printStackTrace();

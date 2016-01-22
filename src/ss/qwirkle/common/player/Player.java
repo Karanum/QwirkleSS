@@ -25,7 +25,7 @@ public abstract class Player {
 	public static final int MAX_HAND_SIZE = 6;
 	
 	/**
-	 * Asks the player to make a move and send it to the Board for validation.
+	 * Asks the player to make a move and send it to the Game for validation.
 	 */
 	abstract void determineMove();
 	

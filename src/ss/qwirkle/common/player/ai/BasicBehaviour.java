@@ -29,25 +29,25 @@ public class BasicBehaviour implements Behaviour {
 					if (!result && !b.hasTile(x + 1, y)) {
 						if (BoardChecker.canPlaceTile(b, tile, x + 1, y)) {
 							result = true;
-							move.addTile(tile, x + 1, y);
+							move.addTile(b, tile, x + 1, y);
 						}
 					}
 					if (!result && !b.hasTile(x - 1, y)) {
 						if (BoardChecker.canPlaceTile(b, tile, x - 1, y)) {
 							result = true;
-							move.addTile(tile, x - 1, y);
+							move.addTile(b, tile, x - 1, y);
 						}
 					}	
 					if (!result && b.hasTile(x, y - 1)) {
 						if (BoardChecker.canPlaceTile(b, tile, x, y - 1)) {
 							result = true;	
-							move.addTile(tile, x, y - 1);
+							move.addTile(b, tile, x, y - 1);
 						}
 					}
 					if (!result && !b.hasTile(x, y + 1)) {
 						if (BoardChecker.canPlaceTile(b, tile, x, y + 1)) {
 							result = true;
-							move.addTile(tile, x, y + 1);
+							move.addTile(b, tile, x, y + 1);
 						}
 					} else { 
 						myTiles.remove(tile);

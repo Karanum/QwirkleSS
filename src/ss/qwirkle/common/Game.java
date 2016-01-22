@@ -8,6 +8,8 @@ import ss.qwirkle.common.player.Player;
 import ss.qwirkle.common.player.SocketPlayer;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.common.ui.UI;
+import ss.qwirkle.exceptions.InvalidMoveException;
+import ss.qwirkle.exceptions.MoveOrderException;
 
 /**
  * Controller class for the game. Starts matches and handles communication between
@@ -24,6 +26,7 @@ public class Game {
 	//@ private invariant board != null;
 	//@ private invariant bag != null;
 	private List<Player> players;
+	private Player currentPlayer;
 	private HumanPlayer localPlayer;
 	private UI ui;
 	private Board board;
@@ -32,19 +35,22 @@ public class Game {
 	/**
 	 * Creates a new Game object.
 	 */
-	public Game(UI ui) {
+	public Game() {
 		players = new ArrayList<Player>();
 		//ui = new TUI(this);
-		this.ui = ui;
 		board = new Board();
 		bag = new Bag();
+	}
+	
+	public void setUI(UI ui) {
+		this.ui = ui;
 	}
 	
 	/**
 	 * Prepares the game for starting.
 	 */
 	public void setup() {
-		localPlayer = new HumanPlayer("");
+		localPlayer = new HumanPlayer(this, "");
 		players.add(localPlayer);
 	}
 	
@@ -58,6 +64,8 @@ public class Game {
 			}
 		}
 		ui.update();
+		currentPlayer = localPlayer;
+		localPlayer.determineMove();
 		ui.run();
 	}
 	
@@ -109,6 +117,16 @@ public class Game {
 	
 	public HumanPlayer getLocalPlayer() {
 		return localPlayer;
+	}
+	
+	public void doMove(Player p, Move move) throws InvalidMoveException, MoveOrderException {
+		if (p != currentPlayer) {
+			throw new MoveOrderException();
+		}
+		board.doMove(move);
+		giveTiles(p);
+		ui.update();
+		localPlayer.determineMove();
 	}
 	
 }

@@ -10,6 +10,7 @@ import ss.qwirkle.common.tiles.Pattern;
 import ss.qwirkle.common.tiles.Shape;
 import ss.qwirkle.common.tiles.ShapePattern;
 import ss.qwirkle.common.tiles.Tile;
+import ss.qwirkle.exceptions.InvalidMoveException;
 import ss.qwirkle.util.Range;
 
 /**
@@ -21,7 +22,7 @@ public class Move {
 	private static int nextId = 0;
 	
 	//@ private invariant points >= 0;
-	//@private invariant tiles != null;
+	//@ private invariant tiles != null;
 	private int points;
 	private List<Tile> tiles;
 	private MoveType type;
@@ -56,8 +57,8 @@ public class Move {
 		return points;
 	}
 	
-	public void addTile(Tile tile, int x, int y) {
-		if (applyMove(tile, x, y)) {
+	public void addTile(Board b, Tile tile, int x, int y) throws InvalidMoveException {
+		if (applyMove(b, tile, x, y)) {
 			tile.setX(x);
 			tile.setY(y);
 			tile.setMoveId(id);
@@ -66,6 +67,8 @@ public class Move {
 			xRange.setMaxIfMore(x);
 			yRange.setMinIfLess(y);
 			yRange.setMaxIfMore(y);
+		} else {
+			throw new InvalidMoveException();
 		}
 	}
 	
@@ -91,6 +94,15 @@ public class Move {
 		return result;
 	}
 	
+	public boolean hasTile(int x, int y) {
+		for (Tile tile : tiles) {
+			if (tile.getX() == x && tile.getY() == y) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public MoveType getType() {
 		return type;
 	}
@@ -103,7 +115,10 @@ public class Move {
 		return yRange;
 	}
 	
-	private boolean applyMove(Tile tile, int x, int y) {
+	private boolean applyMove(Board b, Tile tile, int x, int y) {
+		if (!BoardChecker.canPlaceTile(b, tile, x, y, false) || hasTile(x, y)) {
+			return false;
+		}
 		if (!tiles.isEmpty()) {
 			if (type == MoveType.SINGULAR) {
 				return applyMoveSingular(tile, x, y);

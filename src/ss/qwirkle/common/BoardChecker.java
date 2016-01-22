@@ -6,7 +6,8 @@ import ss.qwirkle.util.Range;
 
 public abstract class BoardChecker {
 
-	public static boolean canPlaceTile(Board board, Tile tile, int x, int y) {
+	public static boolean canPlaceTile(Board board, Tile tile, int x, int y, 
+										boolean checkAttached) {
 		if (board.isEmpty()) {
 			if (x == 0 && y == 0) {
 				return true;
@@ -15,10 +16,14 @@ public abstract class BoardChecker {
 		if (board.hasTile(x, y)) {
 			return false;
 		}
-		if (!isCoordAttached(board, x, y)) {
+		if (checkAttached && !isCoordAttached(board, x, y)) {
 			return false;
 		}
 		return canConnectPatterns(board, tile, x, y);
+	}
+	
+	public static boolean canPlaceTile(Board board, Tile tile, int x, int y) {
+		return canPlaceTile(board, tile, x, y, true);
 	}
 	
 	public static boolean isCoordAttached(Board board, int x, int y) {

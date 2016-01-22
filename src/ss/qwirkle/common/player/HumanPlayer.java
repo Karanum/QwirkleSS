@@ -2,9 +2,13 @@ package ss.qwirkle.common.player;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import ss.qwirkle.common.Game;
 import ss.qwirkle.common.Move;
 import ss.qwirkle.common.tiles.Tile;
+import ss.qwirkle.exceptions.InvalidMoveException;
+import ss.qwirkle.exceptions.MoveOrderException;
 
 /**
  * A Player that is controlled by the local user.
@@ -13,14 +17,16 @@ import ss.qwirkle.common.tiles.Tile;
 public class HumanPlayer extends Player {
 
 	private Move move;
+	private Game game;
 	
 	/**
 	 * Creates a new human player with the specified name.
 	 * @param name The name of the new player
 	 */
 	//@ requires name != null;
-	public HumanPlayer(String name) {
+	public HumanPlayer(Game game, String name) {
 		super(name);
+		this.game = game;
 	}
 	
 	/**
@@ -40,23 +46,47 @@ public class HumanPlayer extends Player {
 	 */
 	//@ requires 0 <= handIndex && handIndex < Player.MAX_HAND_SIZE;
 	//@ ensures move == null ==> !\result;
-	public boolean makeMove(int handIndex, int x, int y) {
+	public boolean makeMove(int handIndex, int x, int y) throws InvalidMoveException {
 		if (move == null || handIndex >= hand.size()) {
+			System.out.println("It's not your turn, or your hand is botched!");
+			System.out.println("Hand index: " + handIndex);
+			System.out.println("Move: " + move);
 			return false;
 		}
 		Tile tile = hand.get(handIndex);
-		move.addTile(tile, x, y);
+		move.addTile(game.getBoard(), tile, x, y);
+		hand.remove(handIndex);
 		return true;
 	}
 	
 	/**
-	 * Finishes the player's move, sending it to the board for checking.
+	 * Finishes the player's move, sending it to the game for checking.
 	 */
 	//@ requires move != null;
 	//@ ensures move == null;
-	public void finishMove() {
-		//TODO: Send move to board for checking
+	public void finishMove() throws InvalidMoveException {
+		Move m = move;
 		move = null;
+		try {
+			game.doMove(this, m);
+		} catch (MoveOrderException e) {
+			System.out.println("ERROR: Player moved out of turn! Name: " + getName());
+		} catch (InvalidMoveException e) {
+			move = m;
+			throw e;
+		}
+	}
+	
+	public void resetMove() {
+		if (move != null) {
+			hand.addAll(move.getTiles());
+			Collections.sort(hand);
+			move = new Move();
+		}
+	}
+	
+	public Optional<Move> getCurrentMove() {
+		return move != null ? Optional.of(move) : Optional.empty();
 	}
 	
 	/**

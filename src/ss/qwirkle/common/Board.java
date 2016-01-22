@@ -28,8 +28,8 @@ public class Board {
 	 */
 	public Board() {
 		board = new HashMap<Integer, Map<Integer, Tile>>();
-		xRange = new Range();
-		yRange = new Range();
+		xRange = new Range(0, 0);
+		yRange = new Range(0, 0);
 	}
 	
 	public Board(Board b) {

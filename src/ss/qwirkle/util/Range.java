@@ -13,14 +13,14 @@ public class Range {
 		max = null;
 	}
 	
-//	public Range(int min, int max) {
-//		this.min = min;
-//		this.max = max;
-//	}
+	public Range(int min, int max) {
+		this.min = min;
+		this.max = max;
+	}
 	
 	public Range(Range r) {
-		min = r.getMin();
-		max = r.getMax();
+		min = r.getMin().intValue();
+		max = r.getMax().intValue();
 	}
 	
 	public void setMin(int n) {
@@ -47,12 +47,12 @@ public class Range {
 		}
 	}
 	
-	public int getMin() {
-		return min;
+	public Integer getMin() {
+		return min != null ? min : Integer.MAX_VALUE;
 	}
 	
-	public int getMax() {
-		return max;
+	public Integer getMax() {
+		return max != null ? max : Integer.MIN_VALUE;
 	}
 	
 	public List<Integer> forEach() {
@@ -63,4 +63,16 @@ public class Range {
 		return iterator;
 	}
 	
+	public Range combine(Range r) {
+		Range result = new Range(this);
+		Integer rMin = r.getMin();
+		Integer rMax = r.getMax();
+		if (rMin != null) {
+			result.setMinIfLess(rMin);
+		}
+		if (rMax != null) {
+			result.setMaxIfMore(rMax);
+		}
+		return result;
+	}
 }
