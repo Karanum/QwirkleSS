@@ -42,16 +42,18 @@ public class Game {
 		bag = new Bag();
 	}
 	
-	public void setUI(UI ui) {
-		this.ui = ui;
-	}
-	
 	/**
 	 * Prepares the game for starting.
 	 */
-	public void setup() {
-		localPlayer = new HumanPlayer(this, "");
-		players.add(localPlayer);
+	public void setup(UI ui) {
+		this.ui = ui;
+	}
+	
+	public void addPlayer(Player p) {
+		if (p instanceof HumanPlayer) {
+			localPlayer = (HumanPlayer) p;
+		}
+		players.add(p);
 	}
 	
 	/**
@@ -73,7 +75,9 @@ public class Game {
 	 * Clears up unused resources at the end of a game.
 	 */
 	public void dispose() {
-		//TODO: Create function body
+		players.clear();
+		board = new Board();
+		bag = new Bag();
 	}
 	
 	/**

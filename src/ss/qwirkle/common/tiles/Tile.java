@@ -98,7 +98,7 @@ public class Tile implements Comparable<Tile> {
 	 */
 	//@ pure
 	public Optional<Pattern> getHorzPattern() {
-		return horzPattern == null ? Optional.empty() : Optional.of(horzPattern);
+		return horzPattern == null ? Optional.<Pattern>empty() : Optional.<Pattern>of(horzPattern);
 	}
 	
 	/**
@@ -106,7 +106,7 @@ public class Tile implements Comparable<Tile> {
 	 */
 	//@ pure
 	public Optional<Pattern> getVertPattern() {
-		return vertPattern == null ? Optional.empty() : Optional.of(vertPattern);
+		return vertPattern == null ? Optional.<Pattern>empty() : Optional.<Pattern>of(vertPattern);
 	}
 	
 	/**
@@ -114,7 +114,7 @@ public class Tile implements Comparable<Tile> {
 	 * @param p The horizontal pattern
 	 */
 	//@ requires p != null;
-	//@ ensures getHorzPattern() == p;
+	//@ ensures getHorzPattern().orElse(null) == p;
 	public void setHorzPattern(Pattern p) {
 		horzPattern = p;
 	}
@@ -124,7 +124,7 @@ public class Tile implements Comparable<Tile> {
 	 * @param p The vertical pattern
 	 */
 	//@ requires p != null;
-	//@ ensures getVertPattern() == p;
+	//@ ensures getVertPattern().orElse(null) == p;
 	public void setVertPattern(Pattern p) {
 		vertPattern = p;
 	}
@@ -175,13 +175,13 @@ public class Tile implements Comparable<Tile> {
 			ColorPattern p = new ColorPattern(color);
 			p.add(tile);
 			p.add(this);
-			result = Optional.of(p);
+			result = Optional.<Pattern>of(p);
 		}
 		if (shape == tile.getShape() && color != tile.getColor()) {
 			ShapePattern p = new ShapePattern(shape);
 			p.add(tile);
 			p.add(this);
-			result = Optional.of(p);
+			result = Optional.<Pattern>of(p);
 		}
 		return result;
 	}

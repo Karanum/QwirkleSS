@@ -8,6 +8,7 @@ import java.util.Random;
 import ss.qwirkle.common.tiles.Color;
 import ss.qwirkle.common.tiles.Shape;
 import ss.qwirkle.common.tiles.Tile;
+import ss.qwirkle.common.player.Player;
 
 /**
  * Container class for tiles that are not on the board or in a player's hand.

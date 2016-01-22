@@ -45,12 +45,9 @@ public class HumanPlayer extends Player {
 	 * @return Success value
 	 */
 	//@ requires 0 <= handIndex && handIndex < Player.MAX_HAND_SIZE;
-	//@ ensures move == null ==> !\result;
+	//@ ensures getCurrentMove().orElse(null) == null ==> !\result;
 	public boolean makeMove(int handIndex, int x, int y) throws InvalidMoveException {
 		if (move == null || handIndex >= hand.size()) {
-			System.out.println("It's not your turn, or your hand is botched!");
-			System.out.println("Hand index: " + handIndex);
-			System.out.println("Move: " + move);
 			return false;
 		}
 		Tile tile = hand.get(handIndex);
@@ -62,8 +59,8 @@ public class HumanPlayer extends Player {
 	/**
 	 * Finishes the player's move, sending it to the game for checking.
 	 */
-	//@ requires move != null;
-	//@ ensures move == null;
+	//@ requires getCurrentMove().orElse(null) != null;
+	//@ ensures getCurrentMove().orElse(null) == null;
 	public void finishMove() throws InvalidMoveException {
 		Move m = move;
 		move = null;
@@ -85,8 +82,9 @@ public class HumanPlayer extends Player {
 		}
 	}
 	
+	//@ pure
 	public Optional<Move> getCurrentMove() {
-		return move != null ? Optional.of(move) : Optional.empty();
+		return move != null ? Optional.<Move>of(move) : Optional.<Move>empty();
 	}
 	
 	/**

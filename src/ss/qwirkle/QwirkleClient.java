@@ -11,8 +11,7 @@ public class QwirkleClient {
 		Game.type = GameType.SINGLEPLAYER;
 		
 		Game game = new Game();
-		game.setUI(new TUI(game));
-		game.setup();
+		game.setup(new TUI(game));
 		game.start();
 	}
 	
