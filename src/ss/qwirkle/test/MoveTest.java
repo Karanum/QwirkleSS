@@ -5,11 +5,11 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import ss.qwirkle.client.Move;
-import ss.qwirkle.client.tiles.Color;
-import ss.qwirkle.client.tiles.Shape;
-import ss.qwirkle.client.tiles.ShapePattern;
-import ss.qwirkle.client.tiles.Tile;
+import ss.qwirkle.common.Move;
+import ss.qwirkle.common.tiles.Color;
+import ss.qwirkle.common.tiles.Shape;
+import ss.qwirkle.common.tiles.ShapePattern;
+import ss.qwirkle.common.tiles.Tile;
 
 public class MoveTest {
 

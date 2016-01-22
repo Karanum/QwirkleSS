@@ -1,10 +1,10 @@
-package ss.qwirkle.client.player;
+package ss.qwirkle.common.player;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ss.qwirkle.client.Move;
-import ss.qwirkle.client.tiles.Tile;
+import ss.qwirkle.common.Move;
+import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.exceptions.NegativeArgumentException;
 
 /**

@@ -1,4 +1,4 @@
-package ss.qwirkle.client.ui;
+package ss.qwirkle.common.ui;
 
 /**
  * UI interface that handles interaction with the user.

@@ -1,13 +1,13 @@
-package ss.qwirkle.client;
+package ss.qwirkle.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import ss.qwirkle.client.tiles.Color;
-import ss.qwirkle.client.tiles.Shape;
-import ss.qwirkle.client.tiles.Tile;
+import ss.qwirkle.common.tiles.Color;
+import ss.qwirkle.common.tiles.Shape;
+import ss.qwirkle.common.tiles.Tile;
 
 /**
  * Container class for tiles that are not on the board or in a player's hand.

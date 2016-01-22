@@ -1,10 +1,10 @@
-package ss.qwirkle.client.player;
+package ss.qwirkle.common.player;
 
 import java.util.Collections;
 import java.util.List;
 
-import ss.qwirkle.client.Move;
-import ss.qwirkle.client.tiles.Tile;
+import ss.qwirkle.common.Move;
+import ss.qwirkle.common.tiles.Tile;
 
 /**
  * A Player that is controlled by the local user.

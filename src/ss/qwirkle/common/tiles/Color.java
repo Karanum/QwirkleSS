@@ -1,4 +1,4 @@
-package ss.qwirkle.client.tiles;
+package ss.qwirkle.common.tiles;
 
 /**
  * The different colors that the tiles can have.

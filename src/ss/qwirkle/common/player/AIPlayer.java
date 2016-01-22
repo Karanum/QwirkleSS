@@ -1,6 +1,6 @@
-package ss.qwirkle.client.player;
+package ss.qwirkle.common.player;
 
-import ss.qwirkle.client.player.ai.Behaviour;
+import ss.qwirkle.common.player.ai.Behaviour;
 
 /**
  * A Player that makes use of a set Behaviour to determine its moves.

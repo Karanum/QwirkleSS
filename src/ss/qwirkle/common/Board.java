@@ -1,17 +1,13 @@
-package ss.qwirkle.client;
+package ss.qwirkle.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import ss.qwirkle.client.Move.MoveType;
-import ss.qwirkle.client.tiles.Color;
-import ss.qwirkle.client.tiles.Pattern;
-import ss.qwirkle.client.tiles.Shape;
-import ss.qwirkle.client.tiles.Tile;
+import ss.qwirkle.common.tiles.Pattern;
+import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.exceptions.InvalidMoveException;
 import ss.qwirkle.util.Range;
 
@@ -24,16 +20,22 @@ public class Board {
 	//@ private invariant board != null;
 	//@ private invariant (\forall Integer i; board.containsKey(i); board.get(i) != null);
 	private Map<Integer, Map<Integer, Tile>> board;
+	private Range xRange;
+	private Range yRange;
 	
 	/** 
 	 * Creates a new board.
 	 */
 	public Board() {
 		board = new HashMap<Integer, Map<Integer, Tile>>();
+		xRange = new Range();
+		yRange = new Range();
 	}
 	
 	public Board(Board b) {
-		this.board = b.cloneBoard();
+		board = b.cloneBoard();
+		xRange = new Range(b.getXRange());
+		yRange = new Range(b.getYRange());
 	}
 
 	public Optional<Tile> getTile(int x, int y) {
@@ -51,6 +53,14 @@ public class Board {
 	//@ pure
 	public boolean hasTile(int x, int y) {
 		return board.containsKey(y) && board.get(y).containsKey(x);
+	}
+	
+	public Range getXRange() {
+		return xRange;
+	}
+	
+	public Range getYRange() {
+		return yRange;
 	}
 	
 	public boolean isEmpty() {
@@ -99,6 +109,10 @@ public class Board {
 			board.put(y, new HashMap<Integer, Tile>());
 		}
 		board.get(y).put(x, tile);
+		xRange.setMinIfLess(x);
+		xRange.setMaxIfMore(x);
+		yRange.setMinIfLess(y);
+		yRange.setMaxIfMore(y);
 		connectPatterns(tile, x, y);
 	}
 	

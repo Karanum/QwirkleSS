@@ -1,4 +1,4 @@
-package ss.qwirkle.client.tiles;
+package ss.qwirkle.common.tiles;
 
 import java.util.ArrayList;
 import java.util.List;

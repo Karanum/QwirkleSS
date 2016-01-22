@@ -13,9 +13,14 @@ public class Range {
 		max = null;
 	}
 	
-	public Range(int min, int max) {
-		this.min = min;
-		this.max = max;
+//	public Range(int min, int max) {
+//		this.min = min;
+//		this.max = max;
+//	}
+	
+	public Range(Range r) {
+		min = r.getMin();
+		max = r.getMax();
 	}
 	
 	public void setMin(int n) {

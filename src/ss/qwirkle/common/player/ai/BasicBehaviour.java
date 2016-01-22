@@ -1,13 +1,14 @@
-package ss.qwirkle.client.player.ai;
+package ss.qwirkle.common.player.ai;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import ss.qwirkle.client.Board;
-import ss.qwirkle.client.Move;
-import ss.qwirkle.client.tiles.Tile;
+import ss.qwirkle.common.Board;
+import ss.qwirkle.common.BoardChecker;
+import ss.qwirkle.common.Move;
+import ss.qwirkle.common.tiles.Tile;
 
 public class BasicBehaviour implements Behaviour {
 
@@ -26,25 +27,25 @@ public class BasicBehaviour implements Behaviour {
 				int y = boardTile.getY();
 				for (Tile tile : myTiles) {
 					if (!result && !b.hasTile(x + 1, y)) {
-						if (b.canPlaceTile(tile, x + 1, y)) {
+						if (BoardChecker.canPlaceTile(b, tile, x + 1, y)) {
 							result = true;
 							move.addTile(tile, x + 1, y);
 						}
 					}
 					if (!result && !b.hasTile(x - 1, y)) {
-						if (b.canPlaceTile(tile, x - 1, y)) {
+						if (BoardChecker.canPlaceTile(b, tile, x - 1, y)) {
 							result = true;
 							move.addTile(tile, x - 1, y);
 						}
 					}	
 					if (!result && b.hasTile(x, y - 1)) {
-						if (b.canPlaceTile(tile, x, y - 1)) {
+						if (BoardChecker.canPlaceTile(b, tile, x, y - 1)) {
 							result = true;	
 							move.addTile(tile, x, y - 1);
 						}
 					}
 					if (!result && !b.hasTile(x, y + 1)) {
-						if (b.canPlaceTile(tile, x, y + 1)) {
+						if (BoardChecker.canPlaceTile(b, tile, x, y + 1)) {
 							result = true;
 							move.addTile(tile, x, y + 1);
 						}

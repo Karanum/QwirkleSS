@@ -1,15 +1,15 @@
-package ss.qwirkle.client;
+package ss.qwirkle.common;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import ss.qwirkle.client.tiles.Color;
-import ss.qwirkle.client.tiles.ColorPattern;
-import ss.qwirkle.client.tiles.Pattern;
-import ss.qwirkle.client.tiles.Shape;
-import ss.qwirkle.client.tiles.ShapePattern;
-import ss.qwirkle.client.tiles.Tile;
+import ss.qwirkle.common.tiles.Color;
+import ss.qwirkle.common.tiles.ColorPattern;
+import ss.qwirkle.common.tiles.Pattern;
+import ss.qwirkle.common.tiles.Shape;
+import ss.qwirkle.common.tiles.ShapePattern;
+import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.util.Range;
 
 /**
@@ -27,6 +27,7 @@ public class Move {
 	private MoveType type;
 	private Range xRange;
 	private Range yRange;
+	private Pattern pattern;
 	private int id;
 	
 	public enum MoveType {
@@ -107,21 +108,17 @@ public class Move {
 			if (type == MoveType.SINGULAR) {
 				return applyMoveSingular(tile, x, y);
 			} else if (type == MoveType.VERTICAL) {
-				int moveY = yRange.getMin();
-				Tile prevTile = tiles.get(0);
-				Pattern p = prevTile.getVertPattern().orElse(null);
-				if (y != moveY || !p.canAdd(tile)) {
-					return false;
-				}
-				p.add(tile);
-			} else {
 				int moveX = xRange.getMin();
-				Tile prevTile = tiles.get(0);
-				Pattern p = prevTile.getHorzPattern().orElse(null);
-				if (x != moveX || !p.canAdd(tile)) {
+				if (x != moveX || !pattern.canAdd(tile)) {
 					return false;
 				}
-				p.add(tile);
+				pattern.add(tile);
+			} else {
+				int moveY = yRange.getMin();
+				if (y != moveY || !pattern.canAdd(tile)) {
+					return false;
+				}
+				pattern.add(tile);
 			}
 		}
 		return true;
@@ -132,16 +129,15 @@ public class Move {
 		int prevX = prevTile.getX();
 		int prevY = prevTile.getY();
 		
-		Pattern p = null;
 		Color prevColor = prevTile.getColor();
 		Shape prevShape = prevTile.getShape();
 		if (tile.getColor() == prevColor) {
 			if (tile.getShape() == prevShape) {
 				return false;
 			}
-			p = new ColorPattern(prevColor);
+			pattern = new ColorPattern(prevColor);
 		} else if (tile.getShape() == prevShape) {
-			p = new ShapePattern(prevShape);
+			pattern = new ShapePattern(prevShape);
 		} else {
 			return false;
 		}
@@ -150,16 +146,16 @@ public class Move {
 			return false;
 		}
 		
-		p.add(prevTile);
-		p.add(tile);
+		pattern.add(prevTile);
+		pattern.add(tile);
 		if (prevX == x) {
 			type = MoveType.VERTICAL;
-			prevTile.setVertPattern(p);
-			tile.setVertPattern(p);
+			//prevTile.setVertPattern(p);
+			//tile.setVertPattern(p);
 		} else {
 			type = MoveType.HORIZONTAL;
-			prevTile.setHorzPattern(p);
-			tile.setHorzPattern(p);
+			//prevTile.setHorzPattern(p);
+			//tile.setHorzPattern(p);
 		}
 		return true;
 	}

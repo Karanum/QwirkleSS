@@ -8,10 +8,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import ss.qwirkle.client.Bag;
-import ss.qwirkle.client.tiles.Color;
-import ss.qwirkle.client.tiles.Shape;
-import ss.qwirkle.client.tiles.Tile;
+import ss.qwirkle.common.Bag;
+import ss.qwirkle.common.tiles.Color;
+import ss.qwirkle.common.tiles.Shape;
+import ss.qwirkle.common.tiles.Tile;
 
 public class BagTest {
 

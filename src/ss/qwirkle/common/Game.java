@@ -1,14 +1,13 @@
-package ss.qwirkle.client;
+package ss.qwirkle.common;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ss.qwirkle.client.player.HumanPlayer;
-import ss.qwirkle.client.player.Player;
-import ss.qwirkle.client.player.SocketPlayer;
-import ss.qwirkle.client.tiles.Tile;
-import ss.qwirkle.client.ui.TUI;
-import ss.qwirkle.client.ui.UI;
+import ss.qwirkle.common.player.HumanPlayer;
+import ss.qwirkle.common.player.Player;
+import ss.qwirkle.common.player.SocketPlayer;
+import ss.qwirkle.common.tiles.Tile;
+import ss.qwirkle.common.ui.UI;
 
 /**
  * Controller class for the game. Starts matches and handles communication between
@@ -16,6 +15,9 @@ import ss.qwirkle.client.ui.UI;
  * @author Karanum
  */
 public class Game {
+	
+	public enum GameType { NONE, SINGLEPLAYER, CLIENT, SERVER };
+	public static GameType type = GameType.NONE;
 	
 	//@ private invariant players != null;
 	//@ private invariant ui != null;
@@ -30,9 +32,10 @@ public class Game {
 	/**
 	 * Creates a new Game object.
 	 */
-	public Game() {
+	public Game(UI ui) {
 		players = new ArrayList<Player>();
-		ui = new TUI(this);
+		//ui = new TUI(this);
+		this.ui = ui;
 		board = new Board();
 		bag = new Bag();
 	}
@@ -106,13 +109,6 @@ public class Game {
 	
 	public HumanPlayer getLocalPlayer() {
 		return localPlayer;
-	}
-	
-	
-	public static void main(String[] args) {
-		Game game = new Game();
-		game.setup();
-		game.start();
 	}
 	
 }

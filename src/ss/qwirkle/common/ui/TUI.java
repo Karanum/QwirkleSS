@@ -1,16 +1,17 @@
-package ss.qwirkle.client.ui;
+package ss.qwirkle.common.ui;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import ss.qwirkle.client.Board;
-import ss.qwirkle.client.Game;
-import ss.qwirkle.client.player.HumanPlayer;
-import ss.qwirkle.client.tiles.Color;
-import ss.qwirkle.client.tiles.Shape;
-import ss.qwirkle.client.tiles.Tile;
+import ss.qwirkle.common.Board;
+import ss.qwirkle.common.Game;
+import ss.qwirkle.common.player.HumanPlayer;
+import ss.qwirkle.common.tiles.Color;
+import ss.qwirkle.common.tiles.Shape;
+import ss.qwirkle.common.tiles.Tile;
+import ss.qwirkle.util.Range;
 
 
 /**
@@ -71,7 +72,7 @@ public class TUI implements UI {
 	}
 	
 	private String getColor(Color color) {
-		return String.valueOf(color.toInt());
+		return String.valueOf(color.toInt() + 1);
 	}
 	
 	private String getTileString(Tile tile) {
@@ -85,7 +86,8 @@ public class TUI implements UI {
 	
 	private void printBoard() {
 		Board board = game.getBoard();
-		//TODO: Implement function
+		Range xRange = board.getXRange();
+		Range yRange = board.getYRange();
 	}
 	
 	private void printHand() {

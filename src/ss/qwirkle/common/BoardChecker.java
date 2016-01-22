@@ -1,8 +1,7 @@
-package ss.qwirkle.client;
+package ss.qwirkle.common;
 
-import ss.qwirkle.client.tiles.ColorPattern;
-import ss.qwirkle.client.tiles.Pattern;
-import ss.qwirkle.client.tiles.Tile;
+import ss.qwirkle.common.tiles.Pattern;
+import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.util.Range;
 
 public abstract class BoardChecker {

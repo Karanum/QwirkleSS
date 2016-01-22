@@ -1,4 +1,4 @@
-package ss.qwirkle.client.player;
+package ss.qwirkle.common.player;
 
 /**
  * A player that is controlled by a remote user over a socket.
