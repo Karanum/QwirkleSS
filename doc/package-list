@@ -1,6 +1,11 @@
-ss.qwirkle.client
-ss.qwirkle.client.player
-ss.qwirkle.client.player.ai
-ss.qwirkle.client.tiles
-ss.qwirkle.client.ui
+nl.utwente.ewi.qwirkle.net
+ss.qwirkle
+ss.qwirkle.common
+ss.qwirkle.common.player
+ss.qwirkle.common.player.ai
+ss.qwirkle.common.tiles
+ss.qwirkle.common.ui
 ss.qwirkle.exceptions
+ss.qwirkle.network
+ss.qwirkle.test
+ss.qwirkle.util
