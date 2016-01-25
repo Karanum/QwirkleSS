@@ -68,13 +68,15 @@ public class ColorPattern implements Pattern {
 	@Override
 	public boolean canMerge(Pattern pattern) {
 		boolean result = false;
-		if (pattern instanceof ColorPattern) {
-			ColorPattern cPattern = (ColorPattern) pattern;
-			if (cPattern.getColor() == color) {
-				result = true;
-				List<Shape> otherShapes = cPattern.getShapes();
-				for (Shape shape : otherShapes) {
-					result = result && !shapes.contains(shape);
+		if (tiles.size() + pattern.getTiles().size() <= 6) {
+			if (pattern instanceof ColorPattern) {
+				ColorPattern cPattern = (ColorPattern) pattern;
+				if (cPattern.getColor() == color) {
+					result = true;
+					List<Shape> otherShapes = cPattern.getShapes();
+					for (Shape shape : otherShapes) {
+						result = result && !shapes.contains(shape);
+					}
 				}
 			}
 		}

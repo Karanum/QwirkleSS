@@ -51,9 +51,8 @@ public class Bag {
 		assert amount > 0 && amount <= Player.MAX_HAND_SIZE;
 		List<Tile> tiles = new ArrayList<Tile>();
 		for (int i = 0; i < amount && getSize() > 0; ++i) {
-			int randInt = rand.nextInt(getSize());
-			Tile tile = bag.remove(randInt);
-			tiles.add(tile);
+			tiles.add(bag.get(0));
+			bag.remove(0);
 		}
 		return tiles;
 	}

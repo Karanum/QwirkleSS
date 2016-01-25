@@ -27,7 +27,7 @@ public abstract class Player {
 	/**
 	 * Asks the player to make a move and send it to the Game for validation.
 	 */
-	abstract void determineMove();
+	public abstract void determineMove();
 	
 	/**
 	 * Creates a new player with the specified name.

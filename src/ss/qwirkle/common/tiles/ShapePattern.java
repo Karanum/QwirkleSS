@@ -60,13 +60,15 @@ public class ShapePattern implements Pattern {
 	@Override
 	public boolean canMerge(Pattern pattern) {
 		boolean result = false;
-		if (pattern instanceof ShapePattern) {
-			ShapePattern sPattern = (ShapePattern) pattern;
-			if (sPattern.getShape() == shape) {
-				result = true;
-				List<Color> otherColors = ((ShapePattern) pattern).getColors();
-				for (Color color : otherColors) {
-					result = result && !colors.contains(color);
+		if (tiles.size() + pattern.getTiles().size() <= 6) {
+			if (pattern instanceof ShapePattern) {
+				ShapePattern sPattern = (ShapePattern) pattern;
+				if (sPattern.getShape() == shape) {
+					result = true;
+					List<Color> otherColors = ((ShapePattern) pattern).getColors();
+					for (Color color : otherColors) {
+						result = result && !colors.contains(color);
+					}
 				}
 			}
 		}

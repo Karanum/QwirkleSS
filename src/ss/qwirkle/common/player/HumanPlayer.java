@@ -68,6 +68,7 @@ public class HumanPlayer extends Player {
 		move = null;
 		try {
 			game.doMove(this, m);
+			game.nextTurn(this);
 		} catch (MoveOrderException e) {
 			System.out.println("ERROR: Player moved out of turn! Name: " + getName());
 		} catch (InvalidMoveException e) {

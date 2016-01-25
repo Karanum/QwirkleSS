@@ -118,6 +118,12 @@ public abstract class BoardChecker {
 		if (tileRight != null && !canConnectHorzPattern(tile, tileRight)) {
 			return false;
 		}
+		if (tileUp != null && tileDown != null && !canConnectVertPattern(tileUp, tileDown)) {
+			return false;
+		}
+		if (tileLeft != null && tileRight != null && !canConnectHorzPattern(tileLeft, tileRight)) {
+			return false;
+		}
 		return true;
 	}
 	
@@ -132,7 +138,8 @@ public abstract class BoardChecker {
 		Pattern p2 = tile2.getVertPattern().orElse(null);
 		if (p1 == null) {
 			if (p2 == null) {
-				return !tile1.equals(tile2);
+				return !tile1.equals(tile2) && (tile1.getColor() == tile2.getColor() || 
+												tile1.getShape() == tile2.getShape());
 			} else {
 				return p2.canAdd(tile1);
 			}
@@ -157,7 +164,8 @@ public abstract class BoardChecker {
 		Pattern p2 = tile2.getHorzPattern().orElse(null);
 		if (p1 == null) {
 			if (p2 == null) {
-				return !tile1.equals(tile2);
+				return !tile1.equals(tile2) && (tile1.getColor() == tile2.getColor() || 
+												tile1.getShape() == tile2.getShape());
 			} else {
 				return p2.canAdd(tile1);
 			}

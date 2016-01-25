@@ -131,8 +131,10 @@ public class TUI extends Thread implements UI {
 	 */
 	private void printGame() {
 		printBoard();
-		System.out.println("\n");
-		printHand();
+		if (game.getLocalPlayer() != null) {
+			System.out.println("\n");
+			printHand();
+		}
 	}
 	
 	/**
@@ -141,7 +143,10 @@ public class TUI extends Thread implements UI {
 	private void printBoard() {
 		System.out.println("\n");
 		Board board = game.getBoard();
-		Move move = game.getLocalPlayer().getCurrentMove().orElse(new Move());
+		Move move = new Move();
+		if (game.getLocalPlayer() != null) {
+			move = game.getLocalPlayer().getCurrentMove().orElse(new Move());
+		}
 		Range xRange = new Range(board.getXRange());
 		Range yRange = new Range(board.getYRange());
 		if (!board.isEmpty() || !move.getTiles().isEmpty()) {

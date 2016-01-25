@@ -22,13 +22,12 @@ public class Game {
 	public static GameType type = GameType.NONE;
 	
 	//@ private invariant players != null && !players.isEmpty();
-	//@ private invariant currentPlayer != null;
 	//@ private invariant Game.type != SERVER ==> localPlayer != null;
 	//@ private invariant ui != null;
 	//@ private invariant board != null;
 	//@ private invariant bag != null;
 	private List<Player> players;
-	private Player currentPlayer;
+	private int currentPlayer;
 	private HumanPlayer localPlayer;
 	private UI ui;
 	private Board board;
@@ -41,6 +40,7 @@ public class Game {
 		players = new ArrayList<Player>();
 		board = new Board();
 		bag = new Bag();
+		currentPlayer = 0;
 	}
 	
 	/**
@@ -73,8 +73,8 @@ public class Game {
 			giveTiles(p);
 		}
 		ui.update();
-		currentPlayer = localPlayer;
-		localPlayer.determineMove();
+		currentPlayer = 0;
+		players.get(0).determineMove();
 		ui.run();
 	}
 	
@@ -119,7 +119,10 @@ public class Game {
 	//@ requires tiles != null;
 	//@ requires tiles.size() == Player.MAX_HAND_SIZE - p.getHandSize();
 	//@ ensures p.getHandSize() == Player.MAX_HAND_SIZE;
-	public void tradeTiles(Player p, List<Tile> tiles) {
+	public void tradeTiles(Player p, List<Tile> tiles) throws MoveOrderException {
+		if (p != players.get(currentPlayer)) {
+			throw new MoveOrderException();
+		}
 		giveTiles(p);
 		bag.returnTiles(tiles);
 	}
@@ -146,19 +149,32 @@ public class Game {
 	 * @param p The player who makes the move
 	 * @param move The move that needs to be performed
 	 * @throws InvalidMoveException Throws this when the board considers the move faulty
-	 * @throws MoveOrderException Throws this when the player tries to move out of turn
+	 * @throws MoveOrderException Throws this when the player tries to act out of turn
 	 */
 	//@ requires p != null && move != null;
 	public void doMove(Player p, Move move) throws InvalidMoveException, MoveOrderException {
-		if (p != currentPlayer) {
+		if (p != players.get(currentPlayer)) {
 			throw new MoveOrderException();
 		}
 		board.doMove(move);
 		giveTiles(p);
+	}
+	
+	/**
+	 * Tells the game to advance to the next player's turn.
+	 * @param p The player trying to end their turn
+	 * @throws MoveOrderException Throws this when the player tries to act out of turn
+	 */
+	public void nextTurn(Player p) throws MoveOrderException {
+		if (p != players.get(currentPlayer)) {
+			throw new MoveOrderException();
+		}
 		ui.update();
-		
-		//TODO: Move turn passing to a separate function
-		localPlayer.determineMove();
+		++currentPlayer;
+		if (currentPlayer >= players.size()) {
+			currentPlayer = 0;
+		}
+		players.get(currentPlayer).determineMove();
 	}
 	
 }

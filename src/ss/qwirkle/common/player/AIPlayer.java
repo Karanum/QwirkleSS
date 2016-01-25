@@ -1,8 +1,14 @@
 package ss.qwirkle.common.player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ss.qwirkle.common.Game;
 import ss.qwirkle.common.Move;
 import ss.qwirkle.common.player.ai.Behaviour;
+import ss.qwirkle.common.tiles.Tile;
+import ss.qwirkle.exceptions.InvalidMoveException;
+import ss.qwirkle.exceptions.MoveOrderException;
 
 /**
  * A Player that makes use of a set Behaviour to determine its moves.
@@ -22,7 +28,7 @@ public class AIPlayer extends Player {
 	//@ requires name != null;
 	//@ requires ai != null;
 	//@ requires game != null;
-	public AIPlayer(String name, Behaviour ai, Game game) {
+	public AIPlayer(Game game, String name, Behaviour ai) {
 		super(name);
 		behaviour = ai;
 		this.game = game;
@@ -34,7 +40,26 @@ public class AIPlayer extends Player {
 	@Override
 	public void determineMove() {
 		Move move = behaviour.determineMove(game.getBoard(), getHand());
-		//TODO: Create function body
+		if (move.getTiles().size() > 0) {
+			try {
+				game.doMove(this, move);
+				game.nextTurn(this);
+			} catch (InvalidMoveException e) {
+				e.printStackTrace();
+			} catch (MoveOrderException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.out.println("Trading!");
+			List<Tile> tiles = new ArrayList<Tile>(hand);
+			hand.clear();
+			try {
+				game.tradeTiles(this, tiles);
+				game.nextTurn(this);
+			} catch (MoveOrderException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 }
