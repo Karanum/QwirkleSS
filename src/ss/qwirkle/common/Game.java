@@ -21,7 +21,9 @@ public class Game {
 	public enum GameType { NONE, SINGLEPLAYER, CLIENT, SERVER };
 	public static GameType type = GameType.NONE;
 	
-	//@ private invariant players != null;
+	//@ private invariant players != null && !players.isEmpty();
+	//@ private invariant currentPlayer != null;
+	//@ private invariant Game.type != SERVER ==> localPlayer != null;
 	//@ private invariant ui != null;
 	//@ private invariant board != null;
 	//@ private invariant bag != null;
@@ -37,18 +39,25 @@ public class Game {
 	 */
 	public Game() {
 		players = new ArrayList<Player>();
-		//ui = new TUI(this);
 		board = new Board();
 		bag = new Bag();
 	}
 	
 	/**
 	 * Prepares the game for starting.
+	 * @param newUi The UI to use for this game
 	 */
-	public void setup(UI ui) {
-		this.ui = ui;
+	//@ requires newUi != null;
+	public void setup(UI newUi) {
+		ui = newUi;
 	}
 	
+	/**
+	 * Adds a player to the list of players.
+	 * If a HumanPlayer is added, it will become the new local player.
+	 * @param p The player to add
+	 */
+	//@ requires p != null;
 	public void addPlayer(Player p) {
 		if (p instanceof HumanPlayer) {
 			localPlayer = (HumanPlayer) p;
@@ -61,9 +70,7 @@ public class Game {
 	 */
 	public void start() {
 		for (Player p : players) {
-			if (!(p instanceof SocketPlayer)) {
-				giveTiles(p);
-			}
+			giveTiles(p);
 		}
 		ui.update();
 		currentPlayer = localPlayer;
@@ -74,6 +81,7 @@ public class Game {
 	/**
 	 * Clears up unused resources at the end of a game.
 	 */
+	//@ ensures getBoard().isEmpty();
 	public void dispose() {
 		players.clear();
 		board = new Board();
@@ -83,6 +91,7 @@ public class Game {
 	/**
 	 * Determines whether the game has ended and who the winner is.
 	 */
+	//@ pure
 	public void determineWinner() {
 		//TODO: Create function body
 	}
@@ -115,14 +124,31 @@ public class Game {
 		bag.returnTiles(tiles);
 	}
 	
+	/**
+	 * Returns the main Board object of this game.
+	 */
+	//@ pure
 	public Board getBoard() {
 		return board;
 	}
 	
+	/**
+	 * Returns the local player.
+	 */
+	//@ pure
 	public HumanPlayer getLocalPlayer() {
 		return localPlayer;
 	}
 	
+	/**
+	 * Performs a move for a player by sending it to the board
+	 * and passing any exceptions back to the player.
+	 * @param p The player who makes the move
+	 * @param move The move that needs to be performed
+	 * @throws InvalidMoveException Throws this when the board considers the move faulty
+	 * @throws MoveOrderException Throws this when the player tries to move out of turn
+	 */
+	//@ requires p != null && move != null;
 	public void doMove(Player p, Move move) throws InvalidMoveException, MoveOrderException {
 		if (p != currentPlayer) {
 			throw new MoveOrderException();
@@ -130,6 +156,8 @@ public class Game {
 		board.doMove(move);
 		giveTiles(p);
 		ui.update();
+		
+		//TODO: Move turn passing to a separate function
 		localPlayer.determineMove();
 	}
 	

@@ -4,8 +4,26 @@ import ss.qwirkle.common.tiles.Pattern;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.util.Range;
 
+/**
+ * Auxiliary class for checking the validity of moves on the board.
+ * @author Karanum
+ */
 public abstract class BoardChecker {
 
+	/**
+	 * Returns whether a tile can be placed on the board.
+	 * @param board The board instance to place the tile on
+	 * @param tile The tile to the placed
+	 * @param x The x coordinate of the tile
+	 * @param y The y coordinate of the tile
+	 * @param checkAttached Whether to check if the tile is attached to any other tiles
+	 */
+	//@ requires board != null;
+	//@ requires tile != null;
+	//@ ensures board.isEmpty() && x == 0 && y == 0 ==> \result;
+	//@ ensures board.hasTile(x, y) ==> !\result;
+	//@ ensures checkAttached && !isCoordAttached(board, x, y) ==> !\result;
+	//@ pure
 	public static boolean canPlaceTile(Board board, Tile tile, int x, int y, 
 										boolean checkAttached) {
 		if (board.isEmpty()) {
@@ -22,10 +40,29 @@ public abstract class BoardChecker {
 		return canConnectPatterns(board, tile, x, y);
 	}
 	
+	/**
+	 * Returns whether a tile can be placed on the board. Checks if it is connected.
+	 * @param board The board instance to place the tile on
+	 * @param tile The tile to the placed
+	 * @param x The x coordinate of the tile
+	 * @param y The y coordinate of the tile
+	 */
+	//@ requires board != null;
+	//@ requires tile != null;
+	//@ ensures \result == canPlaceTile(board, tile, x, y, true);
+	//@ pure
 	public static boolean canPlaceTile(Board board, Tile tile, int x, int y) {
 		return canPlaceTile(board, tile, x, y, true);
 	}
 	
+	/**
+	 * Returns whether the position on the board has any tiles next to it.
+	 * @param board The board instance to check this on
+	 * @param x The x coordinate
+	 * @param y The y coordinate
+	 */
+	//@ requires board != null;
+	//@ pure
 	public static boolean isCoordAttached(Board board, int x, int y) {
 		Tile tileUp = board.getTile(x, y - 1).orElse(null);
 		Tile tileDown = board.getTile(x, y + 1).orElse(null);
@@ -34,6 +71,13 @@ public abstract class BoardChecker {
 		return tileUp != null || tileDown != null || tileLeft != null || tileRight != null;
 	}
 	
+	/**
+	 * Returns whether a move is connected. (That is, no empty tiles in between)
+	 * @param board The board instance to check this on
+	 * @param move The move to be checked
+	 */
+	//@ requires board != null && move != null;
+	//@ pure
 	public static boolean isMoveConnecting(Board board, Move move) {
 		Range xRange = move.getXRange();
 		Range yRange = move.getYRange();
@@ -48,6 +92,15 @@ public abstract class BoardChecker {
 		return true;
 	}
 	
+	
+	/**
+	 * Returns whether a tile can join patterns with the tiles around it.
+	 * @param board The board instance to check this on
+	 * @param tile The tile to be checked
+	 * @param x The x coordinate of the tile
+	 * @param y The y coordinate of the tile
+	 */
+	//@ requires board != null && tile != null;
 	public static boolean canConnectPatterns(Board board, Tile tile, int x, int y) {
 		Tile tileUp = board.getTile(x, y - 1).orElse(null);
 		Tile tileDown = board.getTile(x, y + 1).orElse(null);
@@ -68,6 +121,12 @@ public abstract class BoardChecker {
 		return true;
 	}
 	
+	/**
+	 * Checks if the patterns of 2 tiles can connect vertically.
+	 * @param tile1 The first tile
+	 * @param tile2 The second tile
+	 */
+	//@ pure
 	private static boolean canConnectVertPattern(Tile tile1, Tile tile2) {
 		Pattern p1 = tile1.getVertPattern().orElse(null);
 		Pattern p2 = tile2.getVertPattern().orElse(null);
@@ -87,6 +146,12 @@ public abstract class BoardChecker {
 		return true;
 	}
 	
+	/**
+	 * Checks if the patterns of 2 tiles can connect horizontally.
+	 * @param tile1 The first tile
+	 * @param tile2 The second tile
+	 */
+	//@ pure
 	private static boolean canConnectHorzPattern(Tile tile1, Tile tile2) {
 		Pattern p1 = tile1.getHorzPattern().orElse(null);
 		Pattern p2 = tile2.getHorzPattern().orElse(null);

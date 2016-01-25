@@ -18,6 +18,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+/**
+ * A quick GUI test.
+ * NOTE: Does not function the way it should! Please do not use!
+ * 
+ * @author Karanum
+ */
 public class GUI implements UI, ActionListener {
 
 	JFrame window;

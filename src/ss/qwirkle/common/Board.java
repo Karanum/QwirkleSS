@@ -32,12 +32,26 @@ public class Board {
 		yRange = new Range(0, 0);
 	}
 	
+	/**
+	 * Copies an existing board.
+	 * @param b The board to copy
+	 */
+	//@ requires b != null;
+	//@ ensures getXRange() != b.getXRange() && getYRange() != b.getYRange();
+	//@ ensures (\forall int x, y; hasTile(x, y); getTile(x, y) != b.getTile(x, y));
 	public Board(Board b) {
 		board = b.cloneBoard();
 		xRange = new Range(b.getXRange());
 		yRange = new Range(b.getYRange());
 	}
 
+	/**
+	 * Returns the tile at the specified location.
+	 * @param x The x position of the tile
+	 * @param y The y position of the tile
+	 */
+	//@ ensures hasTile(x, y) ==> \result.orElse(null) != null;
+	//@ pure
 	public Optional<Tile> getTile(int x, int y) {
 		if (board.containsKey(y) && board.get(y).containsKey(x)) {
 			return Optional.of(board.get(y).get(x));
@@ -46,7 +60,7 @@ public class Board {
 	}
 
 	/**
-	 * Returns if a place on the board has no tile.
+	 * Returns whether a place on the board has a tile.
 	 * @param x The x position to check
 	 * @param y The y position to check
 	 */
@@ -55,21 +69,34 @@ public class Board {
 		return board.containsKey(y) && board.get(y).containsKey(x);
 	}
 	
+	/**
+	 * Returns the horizontal range of the board.
+	 */
+	//@ pure
 	public Range getXRange() {
 		return xRange;
 	}
 	
+	/**
+	 * Returns the vertical range of the board.
+	 */
+	//@ pure
 	public Range getYRange() {
 		return yRange;
 	}
 	
+	/**
+	 * Returns whether the board contains no tiles.
+	 */
+	//@ pure
 	public boolean isEmpty() {
-		return board.keySet().size() == 0;
+		return board.keySet().isEmpty();
 	}
 	
-	/** 
-	 * Makes a move on the Board.
-	 * @param move The move that should be done
+	/**
+	 * Places a move on the board.
+	 * @param move The move to make
+	 * @throws InvalidMoveException Throws this when the move is not allowed
 	 */
 	//@ requires move != null;
 	public void doMove(Move move) throws InvalidMoveException {
@@ -81,6 +108,11 @@ public class Board {
 		placeAllTiles(move.getTiles());
 	}
 	
+	/**
+	 * Flattens the board into a one-dimensional collection of tiles.
+	 */
+	//@ ensures \result != null;
+	//@ pure
 	public List<Tile> flattenBoard() {
 		List<Tile> result = new ArrayList<Tile>();
 		for (Integer y : board.keySet()) {
@@ -90,6 +122,13 @@ public class Board {
 		return result;
 	}
 	
+	/**
+	 * Makes a deep copy of the current board contents.
+	 */
+	//@ ensures \result != null;
+	/*@ ensures (\forall int x, y; hasTile(x, y); 
+					\result.containsKey(y) && \result.get(y).containsKey(x)); */
+	//@ pure
 	public Map<Integer, Map<Integer, Tile>> cloneBoard() {
 		Map<Integer, Map<Integer, Tile>> copy = new HashMap<Integer, Map<Integer, Tile>>();
 		for (Integer y : board.keySet()) {
@@ -102,6 +141,12 @@ public class Board {
 		return copy;
 	}
 	
+	/**
+	 * Tries to place a tile on the board.
+	 * @param tile The tile to place, should have proper x and y values
+	 * @throws InvalidMoveException Throws this when the move is not allowed
+	 */
+	//@ requires tile != null;
 	private void placeTile(Tile tile) throws InvalidMoveException {
 		int x = tile.getX();
 		int y = tile.getY();
@@ -116,6 +161,12 @@ public class Board {
 		connectPatterns(tile, x, y);
 	}
 	
+	/**
+	 * Places multiple tiles on the board.
+	 * @param tiles The tiles to place, should have proper x and y values
+	 * @throws InvalidMoveException Throws this when the move is not allowed
+	 */
+	//@ requires tiles != null && !tiles.isEmpty();
 	private void placeAllTiles(List<Tile> tiles) throws InvalidMoveException {
 		List<Tile> tilesCopy = new ArrayList<Tile>(tiles);
 		do {
@@ -134,6 +185,14 @@ public class Board {
 		} while (tilesCopy.size() > 0);
 	}
 	
+	/**
+	 * Connects the patterns of a tile with its adjacent tiles.
+	 * @param tile The tile to connect
+	 * @param x The x position of the tile
+	 * @param y The y position of the tile
+	 * @throws InvalidMoveException Throws this when the move is not allowed
+	 */
+	//@ requires tile != null;
 	private void connectPatterns(Tile tile, int x, int y) throws InvalidMoveException {
 		Tile tileUp = getTile(x, y - 1).orElse(null);
 		Tile tileDown = getTile(x, y + 1).orElse(null);
@@ -145,6 +204,12 @@ public class Board {
 		connectHorzPattern(tile, tileRight);
 	}
 	
+	/**
+	 * Connect the patterns of 2 tiles vertically.
+	 * @param tile1 The first tile
+	 * @param tile2 The second tile
+	 * @throws InvalidMoveException Throws this when the move is not allowed
+	 */
 	private void connectVertPattern(Tile tile1, Tile tile2) throws InvalidMoveException {
 		if (tile1 == null || tile2 == null) {
 			return;
@@ -174,6 +239,12 @@ public class Board {
 		}
 	}
 	
+	/**
+	 * Connect the patterns of 2 tiles horizontally.
+	 * @param tile1 The first tile
+	 * @param tile2 The second tile
+	 * @throws InvalidMoveException Throws this when the move is not allowed
+	 */
 	private void connectHorzPattern(Tile tile1, Tile tile2) throws InvalidMoveException {
 		if (tile1 == null || tile2 == null) {
 			return;
@@ -202,7 +273,4 @@ public class Board {
 			}
 		}
 	}
-	//public Map<Integer, Map<Integer, Tile>> possibleTiles() {
-	//	return null;
-	//}
 }

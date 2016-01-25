@@ -8,6 +8,12 @@ import java.util.List;
  */
 public interface Pattern {
 	
+	/**
+	 * Makes a copy of the pattern and all its tiles.
+	 */
+	//@ ensures \result.getPoints() == getPoints();
+	/*@ ensures (\forall int i; 0 < i && i < getTiles().size();
+						getTiles().get(i).equals(\result.getTiles().get(i))); */
 	public Pattern copy();
 	
 	/**
@@ -47,7 +53,7 @@ public interface Pattern {
 	public int getPoints();
 	
 	/**
-	 * Returns a list of tiles contained in this pattern.
+	 * Returns the list of tiles contained in this pattern.
 	 */
 	//@ pure
 	public List<Tile> getTiles();

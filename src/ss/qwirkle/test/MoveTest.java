@@ -1,6 +1,7 @@
 package ss.qwirkle.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -9,7 +10,6 @@ import ss.qwirkle.common.Board;
 import ss.qwirkle.common.Move;
 import ss.qwirkle.common.tiles.Color;
 import ss.qwirkle.common.tiles.Shape;
-import ss.qwirkle.common.tiles.ShapePattern;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.exceptions.InvalidMoveException;
 

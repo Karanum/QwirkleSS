@@ -3,8 +3,8 @@ package ss.qwirkle.common.tiles;
 import java.util.Optional;
 
 /**
+ * A single Qwirkle tile.
  * @author Dylan
- * 
  */
 public class Tile implements Comparable<Tile> {
 	
@@ -40,6 +40,25 @@ public class Tile implements Comparable<Tile> {
 		moveId = -1;
 	}
 	
+	/**
+	 * Creates a tile object from its integer value.
+	 * @param id The integer value of the tile
+	 */
+	//@ requires 0 <= id && id < Shape.values().length * Color.values().length;
+	public Tile(int id) {
+		this(Color.fromInt(id / 6), Shape.fromInt(id % 6));
+	}
+	
+	/**
+	 * Copies an existing Tile object.
+	 * @param tile The tile to copy
+	 * @param copyPatterns Whether to deep copy the patterns
+	 */
+	//@ requires tile != null;
+	//@ ensures copyPatterns ==> getHorzPattern() != tile.getHorzPattern();
+	//@ ensures copyPatterns ==> getVertPattern() != tile.getVertPattern();
+	//@ ensures getColor() == tile.getColor() && getShape() == tile.getShape();
+	//@ ensures getMoveId() == tile.getMoveId();
 	public Tile(Tile tile, boolean copyPatterns) {
 		color = tile.getColor();
 		shape = tile.getShape();
@@ -69,10 +88,18 @@ public class Tile implements Comparable<Tile> {
 		return tile.getShape() == shape && tile.getColor() == color;
 	}
 	
+	/**
+	 * Returns the ID of the move this tile belongs to, or -1 if the tile is not part of a move.
+	 */
+	//@ pure
 	public int getMoveId() {
 		return moveId;
 	}
 	
+	/**
+	 * Sets the move ID of this tile.
+	 */
+	//@ ensures getMoveId() == id;
 	public void setMoveId(int id) {
 		moveId = id;
 	}
@@ -129,18 +156,40 @@ public class Tile implements Comparable<Tile> {
 		vertPattern = p;
 	}
 	
+	/**
+	 * Returns the x position of the tile on the board.
+	 * Will return a value even if the tile is not on the board, so this
+	 * should not be used to check if the tile is part of the board.
+	 */
+	//@ pure
 	public int getX() {
 		return x;
 	}
 	
+	/**
+	 * Returns the y position of the tile on the board.
+	 * Will return a value even if the tile is not on the board, so this
+	 * should not be used to check if the tile is part of the board.
+	 */
+	//@ pure
 	public int getY() {
 		return y;
 	}
 	
+	/**
+	 * Sets the x position of the tile on the board.
+	 * @param x The x position
+	 */
+	//@ ensures getX() == x;
 	public void setX(int x) {
 		this.x = x;
 	}
 	
+	/**
+	 * Sets the y position of the tile on the board.
+	 * @param y The y position
+	 */
+	//@ ensures getY() == y;
 	public void setY(int y) {
 		this.y = y;
 	}
@@ -155,7 +204,13 @@ public class Tile implements Comparable<Tile> {
 
 	/**
 	 * Compares the tile with another tile based on their integer values.
+	 * @param tile The tile to compare with
 	 */
+	//@ requires tile != null;
+	//@ ensures toInt() < tile.toInt() ==> \result < 0;
+	//@ ensures toInt() == tile.toInt() ==> \result == 0;
+	//@ ensures toInt() > tile.toInt() ==> \result > 0;
+	//@ pure
 	@Override
 	public int compareTo(Tile tile) {
 		int ownValue = toInt();
@@ -169,6 +224,11 @@ public class Tile implements Comparable<Tile> {
 		}
 	}
 	
+	/**
+	 * Checks for a common factor with another tile and returns a new Pattern
+	 * containing both tiles based on this.
+	 * @param tile The tile to form a pattern with
+	 */
 	public Optional<Pattern> makePatternWith(Tile tile) {
 		Optional<Pattern> result = Optional.empty();
 		if (color == tile.getColor() && shape != tile.getShape()) {

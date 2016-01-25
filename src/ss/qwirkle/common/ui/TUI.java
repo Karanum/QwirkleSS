@@ -20,7 +20,7 @@ import ss.qwirkle.util.Range;
  * A textual user interface for the Qwirkle game.
  * @author Karanum
  */
-public class TUI implements UI {
+public class TUI extends Thread implements UI {
 
 	private static final String CORNER = "+";
 	private static final String LINE_DELIM = "----";
@@ -28,10 +28,16 @@ public class TUI implements UI {
 	private static final String TILE_DELIM = "|";
 	private static final String EMPTY_TILE_DELIM = " ";
 	
+	//@ private invariant game != null;
+	//@ private invariant in != null;
 	private Game game;
 	private boolean running;
 	private BufferedReader in;
 	
+	/**
+	 * Creates a new TUI object with reference to the Game.
+	 */
+	//@ requires game != null;
 	public TUI(Game game) {
 		this.game = game;
 		running = true;
@@ -40,6 +46,10 @@ public class TUI implements UI {
 		System.out.println("=-=-= Qwirkle TUI =-=-=");
 	}
 	
+	/**
+	 * Starts polling for user input.
+	 * To make use of multithreading, call start() instead.
+	 */
 	@Override
 	public void run() {
 		showCommandPrompt();
@@ -56,17 +66,28 @@ public class TUI implements UI {
 		}
 	}
 	
+	/**
+	 * Shows a message that asks for user input.
+	 */
 	private void showCommandPrompt() {
 		if (running) {
 			System.out.println("\nEnter your command (or 'help' for a list of commands):");
 		}
 	}
 	
+	/**
+	 * Updates the game board shown by the UI to its most recent state.
+	 */
 	@Override
 	public void update() {
 		printGame();
 	}
 	
+	/**
+	 * Helper function to determine what character to use for each Shape.
+	 */
+	//@ requires shape != null;
+	//@ pure
 	private String getShape(Shape shape) {
 		switch (shape) {
 			case CIRCLE:
@@ -86,20 +107,37 @@ public class TUI implements UI {
 		}
 	}
 	
+	/**
+	 * Helper function to determine what character to use for each Color.
+	 */
+	//@ requires color != null;
+	//@ pure
 	private String getColor(Color color) {
 		return String.valueOf(color.toInt() + 1);
 	}
 	
+	/**
+	 * Helper function to determine what string to use to represent a tile.
+	 * @param tile The tile to represent
+	 */
+	//@ requires tile != null;
+	//@ pure
 	private String getTileString(Tile tile) {
 		return getShape(tile.getShape()) + getColor(tile.getColor());
 	}
 	
+	/**
+	 * Prints the game board and all related aspects.
+	 */
 	private void printGame() {
 		printBoard();
 		System.out.println("\n");
 		printHand();
 	}
 	
+	/**
+	 * Prints the game board on the screen.
+	 */
 	private void printBoard() {
 		System.out.println("\n");
 		Board board = game.getBoard();
@@ -149,6 +187,11 @@ public class TUI implements UI {
 		}
 	}
 	
+	/**
+	 * Prints markers above all of the columns on the board.
+	 * @param xRange The x range of the board
+	 */
+	//@ requires xRange != null;
 	private void printColumnMarkers(Range xRange) {
 		String markerLine = EMPTY_LINE_DELIM + TILE_DELIM;
 		String borderLine = LINE_DELIM + CORNER;
@@ -169,6 +212,9 @@ public class TUI implements UI {
 		System.out.println(borderLine);
 	}
 	
+	/**
+	 * Prints the local player's hand on the screen.
+	 */
 	private void printHand() {
 		HumanPlayer player = game.getLocalPlayer();
 		List<Tile> hand = player.getHand();
@@ -186,6 +232,10 @@ public class TUI implements UI {
 		System.out.println(delimLine + "\n" + tileLine + "\n" + delimLine + "\n" + idLine);
 	}
 
+	/**
+	 * Checks user input and executes the correct commands.
+	 */
+	//@ requires input != null;
 	private void parseInput(String input) {
 		String[] words = input.split(" ");
 		if (words.length > 0) {
@@ -215,6 +265,10 @@ public class TUI implements UI {
 		}
 	}
 	
+	/**
+	 * Breaks down user input for the MOVE command and executes it.
+	 */
+	//@ requires args != null;
 	private void parsePlaceTile(String[] args) {
 		if (game.getLocalPlayer().getCurrentMove().orElse(null) == null) {
 			System.out.println("It's not your turn yet!");
@@ -246,6 +300,12 @@ public class TUI implements UI {
 		}
 	}
 	
+	/**
+	 * Adds a tile to the local player's current move.
+	 * @param handIndex The index of the tile in the player's hand
+	 * @param x The x position on the board
+	 * @param y The y position on the board
+	 */
 	private void placeTile(int handIndex, int x, int y) {
 		Board board = game.getBoard();
 		Move move = game.getLocalPlayer().getCurrentMove().orElse(new Move());
@@ -263,6 +323,10 @@ public class TUI implements UI {
 		}
 	}
 	
+	/**
+	 * Translates user input into a column number.
+	 */
+	//@ requires input != null;
 	private int parseColumn(String input) {
 		int result = -1;
 		char[] chars = input.toCharArray();
@@ -277,6 +341,10 @@ public class TUI implements UI {
 		return result;
 	}
 	
+	/**
+	 * Translates user input into a row number.
+	 */
+	//@ requires input != null;
 	private int parseRow(String input) {
 		int result = -1;
 		try {
@@ -287,6 +355,9 @@ public class TUI implements UI {
 		return result;
 	}
 	
+	/**
+	 * Tells the local player to end their turn.
+	 */
 	private void endTurn() {
 		Move m = game.getLocalPlayer().getCurrentMove().orElse(null);
 		if (m == null) {
@@ -305,6 +376,9 @@ public class TUI implements UI {
 		}
 	}
 	
+	/**
+	 * Tells the local player to discard their current move and start over.
+	 */
 	private void resetMove() {
 		if (game.getLocalPlayer().getCurrentMove().orElse(null) == null) {
 			System.out.println("It's not your turn yet!");
@@ -314,6 +388,9 @@ public class TUI implements UI {
 		update();
 	}
 	
+	/**
+	 * Prints a list of commands and their descriptions on the screen.
+	 */
 	private void showHelp() {
 		System.out.println("\nList of available commands:");
 		System.out.printf("%-25s - %s\n", "MOVE (tile) (column) (row)", 

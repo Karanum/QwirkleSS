@@ -19,4 +19,13 @@ public enum Shape {
 	public int toInt() {
 		return value;
 	}
+	
+	public static Shape fromInt(int id) {
+		for (Shape shape : Shape.values()) {
+			if (shape.toInt() == id) {
+				return shape;
+			}
+		}
+		return null;
+	}
 }

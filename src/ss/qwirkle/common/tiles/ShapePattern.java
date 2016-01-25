@@ -9,8 +9,6 @@ import java.util.List;
  */
 public class ShapePattern implements Pattern {
 	
-	//TODO: Needs to have its JML updated once finished
-	
 	//@ private invariant colors != null;
 	//@ private invariant shape != null;
 	//@ private invariant tiles != null;
@@ -22,7 +20,7 @@ public class ShapePattern implements Pattern {
 	 * Creates a ShapePattern object.
 	 * It consists of tiles with the same shape
 	 * but different colors.
-	 * @param Shape The symbol of the pattern
+	 * @param shape The symbol of the pattern
 	 */
 	//@ requires shape != null;
 	public ShapePattern(Shape shape) {
@@ -31,6 +29,11 @@ public class ShapePattern implements Pattern {
 		tiles = new ArrayList<Tile>();
 	}
 	
+	/**
+	 * Makes a copy of the pattern and all its tiles.
+	 */
+	//@ ensures \result.getShape() == getShape();
+	//@ ensures \result.getColors().containsAll(getColors());
 	@Override
 	public ShapePattern copy() {
 		ShapePattern copy = new ShapePattern(shape);
@@ -49,7 +52,8 @@ public class ShapePattern implements Pattern {
 	}
 	
 	/**
-	 * Returns if a pattern can merge.
+	 * Returns whether a pattern can merged into this pattern.
+	 * @param pattern The pattern to check
 	 */
 	//@ requires pattern != null;
 	//@ ensures pattern instanceof ShapePattern ==> !\result;
@@ -70,9 +74,11 @@ public class ShapePattern implements Pattern {
 	}
 	
 	/**
-	 * Returns if a tile can be added to the pattern.
+	 * Returns whether a tile can be added to the pattern.
+	 * @param tile The tile to check
 	 */
 	//@ requires tile != null;
+	//@ ensures \result == !getColors().contains(tile.getColor()) && tile.getShape() == getShape();
 	@Override
 	public boolean canAdd(Tile tile) {
 		return !colors.contains(tile.getColor()) && tile.getShape() == shape;
@@ -106,18 +112,23 @@ public class ShapePattern implements Pattern {
 	
 	/**
 	 * Add a tile to a ShapePattern.
+	 * @param tile The tile to be added
 	 */
 	//@ requires tile != null;
+	//@ ensures canAdd(tile) ==> getTiles().contains(tile);
+	//@ ensures canAdd(tile) ==> getColors().contains(tile.getColor());
 	@Override
 	public void add(Tile tile) {
-		tiles.add(tile);
-		colors.add(tile.getColor());
-		
+		if (canAdd(tile)) {
+			tiles.add(tile);
+			colors.add(tile.getColor());
+		}
 	}
 	
 	/**
 	 * Returns the points rewarded with this pattern.
 	 */
+	//@ pure
 	@Override
 	public int getPoints() {
 		int points = colors.size();
@@ -134,6 +145,11 @@ public class ShapePattern implements Pattern {
 	public List<Tile> getTiles() {
 		return tiles;
 	}
+	
+	/**
+	 * Returns the shape shared by all tiles in this pattern.
+	 */
+	//@ pure
 	public Shape getShape() {
 		return shape;
 	}

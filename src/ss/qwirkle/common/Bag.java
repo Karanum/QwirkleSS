@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import ss.qwirkle.common.player.Player;
 import ss.qwirkle.common.tiles.Color;
 import ss.qwirkle.common.tiles.Shape;
 import ss.qwirkle.common.tiles.Tile;
-import ss.qwirkle.common.player.Player;
 
 /**
  * Container class for tiles that are not on the board or in a player's hand.
@@ -48,6 +48,7 @@ public class Bag {
 	//@ ensures \result.size() == amount;
 	//@ ensures getSize() == (amount >= getSize() ? \old(getSize()) - amount : 0);
 	public List<Tile> getTiles(int amount) {
+		assert amount > 0 && amount <= Player.MAX_HAND_SIZE;
 		List<Tile> tiles = new ArrayList<Tile>();
 		for (int i = 0; i < amount && getSize() > 0; ++i) {
 			int randInt = rand.nextInt(getSize());

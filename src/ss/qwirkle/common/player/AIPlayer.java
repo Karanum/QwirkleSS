@@ -1,5 +1,7 @@
 package ss.qwirkle.common.player;
 
+import ss.qwirkle.common.Game;
+import ss.qwirkle.common.Move;
 import ss.qwirkle.common.player.ai.Behaviour;
 
 /**
@@ -10,6 +12,7 @@ public class AIPlayer extends Player {
 
 	//@ private invariant behaviour != null;
 	private Behaviour behaviour;
+	private Game game;
 	
 	/**
 	 * Creates a new AI player with the given name and behaviour.
@@ -18,9 +21,11 @@ public class AIPlayer extends Player {
 	 */
 	//@ requires name != null;
 	//@ requires ai != null;
-	public AIPlayer(String name, Behaviour ai) {
+	//@ requires game != null;
+	public AIPlayer(String name, Behaviour ai, Game game) {
 		super(name);
 		behaviour = ai;
+		this.game = game;
 	}
 	
 	/**
@@ -28,7 +33,7 @@ public class AIPlayer extends Player {
 	 */
 	@Override
 	public void determineMove() {
-		//behaviour.determineMove();
+		Move move = behaviour.determineMove(game.getBoard(), getHand());
 		//TODO: Create function body
 	}
 	

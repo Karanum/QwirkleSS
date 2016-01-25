@@ -16,6 +16,7 @@ import ss.qwirkle.exceptions.MoveOrderException;
  */
 public class HumanPlayer extends Player {
 
+	//@ private invariant game != null;
 	private Move move;
 	private Game game;
 	
@@ -24,6 +25,7 @@ public class HumanPlayer extends Player {
 	 * @param name The name of the new player
 	 */
 	//@ requires name != null;
+	//@ requires game != null;
 	public HumanPlayer(Game game, String name) {
 		super(name);
 		this.game = game;
@@ -74,6 +76,11 @@ public class HumanPlayer extends Player {
 		}
 	}
 	
+	/**
+	 * Resets the current move, moving all tiles back to the player's hand.
+	 */
+	/*@ ensures \old(getCurrentMove().orElse(null)) != null ==>
+						getCurrentMove().orElse(null).getTiles().isEmpty(); */
 	public void resetMove() {
 		if (move != null) {
 			hand.addAll(move.getTiles());
@@ -82,6 +89,9 @@ public class HumanPlayer extends Player {
 		}
 	}
 	
+	/**
+	 * Returns the current move in progress of the player, or null if it's not their turn.
+	 */
 	//@ pure
 	public Optional<Move> getCurrentMove() {
 		return move != null ? Optional.<Move>of(move) : Optional.<Move>empty();

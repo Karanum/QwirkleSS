@@ -23,6 +23,9 @@ public class Move {
 	
 	//@ private invariant points >= 0;
 	//@ private invariant tiles != null;
+	//@ private invariant type != null;
+	//@ private invariant xRange != null;
+	//@ private invariant yRange != null;
 	private int points;
 	private List<Tile> tiles;
 	private MoveType type;
@@ -36,7 +39,7 @@ public class Move {
 	}
 	
 	/**
-	 * Creates an empty move object.
+	 * Creates an empty move object and assigns it a move id.
 	 */
 	public Move() {
 		tiles = new ArrayList<Tile>();
@@ -53,10 +56,21 @@ public class Move {
 	/**
 	 * Returns the rewarded points for doing this move.
 	 */
+	//@ pure
 	public int getPoints() {
+		//TODO: Implement proper point calculations :c
 		return points;
 	}
 	
+	/**
+	 * Adds a tile to the move.
+	 * @param b The board instance of the game.
+	 * @param tile The tile to be added
+	 * @param x The x coordinate of the tile
+	 * @param y The y coordinate of the tile
+	 * @throws InvalidMoveException Throws this when the move is not allowed
+	 */
+	//@ requires b != null && tile != null;
 	public void addTile(Board b, Tile tile, int x, int y) throws InvalidMoveException {
 		if (applyMove(b, tile, x, y)) {
 			tile.setX(x);
@@ -72,10 +86,18 @@ public class Move {
 		}
 	}
 	
+	/**
+	 * Returns the list of tiles contained in the move.
+	 */
+	//@ pure
 	public List<Tile> getTiles() {
 		return tiles;
 	}
 	
+	/**
+	 * Returns deep copies of all tiles contained in the move.
+	 */
+	//@ pure
 	public List<Tile> getTileCopies() {
 		List<Tile> result = new ArrayList<Tile>();
 		for (Tile t : tiles) {
@@ -84,6 +106,13 @@ public class Move {
 		return result;
 	}
 	
+	/**
+	 * Returns a tile from the move if it exists.
+	 * @param x The x coordinate of the tile
+	 * @param y The y coordinate of the tile
+	 */
+	//@ ensures hasTile(x, y) ==> \result != null;
+	//@ pure
 	public Optional<Tile> getTile(int x, int y) {
 		Optional<Tile> result = Optional.empty();
 		for (Tile tile : tiles) {
@@ -94,6 +123,13 @@ public class Move {
 		return result;
 	}
 	
+	/**
+	 * Returns whether there is a tile at the specified position in the move.
+	 * @param x The x coordinate
+	 * @param y The y coordinate
+	 * @return
+	 */
+	//@ pure
 	public boolean hasTile(int x, int y) {
 		for (Tile tile : tiles) {
 			if (tile.getX() == x && tile.getY() == y) {
@@ -103,18 +139,39 @@ public class Move {
 		return false;
 	}
 	
+	/**
+	 * Returns the type of the move.
+	 */
+	//@ pure
 	public MoveType getType() {
 		return type;
 	}
 	
+	/**
+	 * Returns the horizontal range of the move.
+	 */
+	//@ pure
 	public Range getXRange() {
 		return xRange;
 	}
 	
+	/**
+	 * Returns the vertical range of the move.
+	 */
+	//@ pure
 	public Range getYRange() {
 		return yRange;
 	}
 	
+	/**
+	 * Prepares a tile to be added to the move.
+	 * @param b The board instance of this game
+	 * @param tile The tile to be added
+	 * @param x The x coordinate of the tile
+	 * @param y The y coordinate of the tile
+	 * @return Success value
+	 */
+	//@ requires b != null && tile != null;
 	private boolean applyMove(Board b, Tile tile, int x, int y) {
 		if (!BoardChecker.canPlaceTile(b, tile, x, y, false) || hasTile(x, y)) {
 			return false;
@@ -139,6 +196,14 @@ public class Move {
 		return true;
 	}
 	
+	/**
+	 * Prepares a tile to be added to the move if the move is singular.
+	 * @param tile The tile to be added
+	 * @param x The x coordinate of the tile
+	 * @param y The y coordinate of the tile
+	 * @return Success value
+	 */
+	//@ requires tile != null;
 	private boolean applyMoveSingular(Tile tile, int x, int y) {
 		Tile prevTile = tiles.get(0);
 		int prevX = prevTile.getX();
@@ -163,15 +228,7 @@ public class Move {
 		
 		pattern.add(prevTile);
 		pattern.add(tile);
-		if (prevX == x) {
-			type = MoveType.VERTICAL;
-			//prevTile.setVertPattern(p);
-			//tile.setVertPattern(p);
-		} else {
-			type = MoveType.HORIZONTAL;
-			//prevTile.setHorzPattern(p);
-			//tile.setHorzPattern(p);
-		}
+		type = prevX == x ? MoveType.VERTICAL : MoveType.HORIZONTAL;
 		return true;
 	}
 

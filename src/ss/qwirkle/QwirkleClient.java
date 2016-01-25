@@ -2,9 +2,13 @@ package ss.qwirkle;
 
 import ss.qwirkle.common.Game;
 import ss.qwirkle.common.Game.GameType;
-import ss.qwirkle.common.ui.GUI;
+import ss.qwirkle.common.player.HumanPlayer;
 import ss.qwirkle.common.ui.TUI;
 
+/**
+ * Main class for the client-side program.
+ * @author Karanum
+ */
 public class QwirkleClient {
 
 	public static void main(String[] args) {
@@ -12,6 +16,7 @@ public class QwirkleClient {
 		
 		Game game = new Game();
 		game.setup(new TUI(game));
+		game.addPlayer(new HumanPlayer(game, "Mark"));
 		game.start();
 	}
 	

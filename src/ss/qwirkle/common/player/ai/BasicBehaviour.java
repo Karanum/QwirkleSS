@@ -10,8 +10,15 @@ import ss.qwirkle.common.Move;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.exceptions.InvalidMoveException;
 
+/**
+ * Basic AI behaviour, makes random moves.
+ * @author Dylan
+ */
 public class BasicBehaviour implements Behaviour {
 
+	/**
+	 * Asks the behaviour to determine a move.
+	 */
 	@Override
 	public Move determineMove(Board b, List<Tile> hand) {
 		List<Tile> myTiles = new ArrayList<Tile>(hand);

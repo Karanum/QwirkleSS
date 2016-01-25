@@ -9,8 +9,6 @@ import java.util.List;
  */
 public class ColorPattern implements Pattern {
 	
-	//TODO: Needs to have its JML updated once finished
-	
 	//@ private invariant shapes != null;
 	//@ private invariant color != null;
 	//@ private invariant tiles != null;
@@ -25,12 +23,18 @@ public class ColorPattern implements Pattern {
 	 * @param color The color of the pattern
 	 */
 	//@ requires color != null;
+	//@ ensures getColor() == color;
 	public ColorPattern(Color color) {
 		this.color = color;
 		shapes = new ArrayList<Shape>();
 		tiles = new ArrayList<Tile>();
 	}
 	
+	/**
+	 * Makes a copy of the pattern and all its tiles.
+	 */
+	//@ ensures \result.getColor() == getColor();
+	//@ ensures \result.getShapes().containsAll(getShapes());
 	public ColorPattern copy() {
 		ColorPattern copy = new ColorPattern(color);
 		for (Tile tile : tiles) {
@@ -47,13 +51,17 @@ public class ColorPattern implements Pattern {
 		return shapes;
 	}
 
+	/**
+	 * Returns the color shared by all tiles in the pattern.
+	 */
 	//@ pure
 	public Color getColor() {
 		return color;
 	}
 
 	/**
-	 * Returns if a pattern can merge.
+	 * Returns whether a pattern can merge into this pattern.
+	 * @param pattern The pattern to check
 	 */
 	//@ requires pattern != null;
 	//@ pure
@@ -74,7 +82,8 @@ public class ColorPattern implements Pattern {
 	}
 	
 	/**
-	 * Returns if a tile can be added to the pattern.
+	 * Returns whether a tile can be added to the pattern.
+	 * @param tile The tile to check
 	 */
 	//@ requires tile != null;
 	//@ pure
@@ -88,7 +97,9 @@ public class ColorPattern implements Pattern {
 	 * Merges the pattern with another ColorPattern.
 	 * @param pattern The pattern to be merged
 	 */
-	//@ requires pattern != null;	
+	//@ requires pattern != null;
+	/*@ ensures canMerge(pattern) ==> getTiles().size() == 
+									\old(getTiles().size()) + pattern.getTiles().size(); */
 	@Override
 	public void merge(Pattern pattern) {
 		if (canMerge(pattern)) {
@@ -111,13 +122,18 @@ public class ColorPattern implements Pattern {
 	}
 	
 	/**
-	 * Adds a tile to ColorPattern.
+	 * Adds a tile to the pattern.
+	 * @param tile The tile to be added
 	 */
 	//@ requires tile != null;
+	//@ ensures canAdd(tile) ==> getTiles().contains(tile);
+	//@ ensures canAdd(tile) ==> getShapes().contains(tile.getShape());
 	@Override
 	public void add(Tile tile) {
-		tiles.add(tile);
-		shapes.add(tile.getShape());
+		if (canAdd(tile)) {
+			tiles.add(tile);
+			shapes.add(tile.getShape());
+		}
 	}
 	
 	/**
@@ -135,7 +151,7 @@ public class ColorPattern implements Pattern {
 	}
 	
 	/**
-	 * Returns a list of tiles contained by this pattern.
+	 * Returns the list of tiles contained by this pattern.
 	 */
 	//@ pure
 	public List<Tile> getTiles() {

@@ -19,4 +19,13 @@ public enum Color {
 	public int toInt() {
 		return value;
 	}
+	
+	public static Color fromInt(int id) {
+		for (Color color : Color.values()) {
+			if (color.toInt() == id) {
+				return color;
+			}
+		}
+		return null;
+	}
 }

@@ -16,5 +16,8 @@ public interface Behaviour {
 	/**
 	 * Asks the behaviour to determine a move.
 	 */
+	//@ requires b != null;
+	//@ requires hand != null && !hand.isEmpty();
+	//@ ensures \result != null;
 	public Move determineMove(Board b, List<Tile> hand);
 }
