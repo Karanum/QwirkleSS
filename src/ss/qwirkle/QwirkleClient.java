@@ -139,7 +139,7 @@ public class QwirkleClient {
 		
 		String prompt = "Please enter your name";
 		if (allowAi) {
-			prompt += " (or empty for AI)";
+			prompt += " (or leave empty for AI)";
 		}
 		prompt += ":";
 		

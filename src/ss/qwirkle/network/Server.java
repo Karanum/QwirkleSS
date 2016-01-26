@@ -116,7 +116,7 @@ public class Server {
     	message += " " + error + " " + msg;
     	send(message);
     }
-    public void winMessage(List<Player> players, String result ) {
+    public void winMessage(List<Player> players, String result) {
     	String message = IProtocol.SERVER_GAMEEND + " " + result;
     	for (Player player : players) {
     		int score = player.getScore();

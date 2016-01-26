@@ -18,7 +18,6 @@ import ss.qwirkle.exceptions.InvalidMoveException;
 public class BasicBehaviour implements Behaviour {
 
 	private Board board;
-	private List<Tile> myHand;
 	private List<Tile> handCopy;
 	private boolean result;
 	private Move move;
@@ -38,7 +37,6 @@ public class BasicBehaviour implements Behaviour {
 	public Move getPossibleMove(Board b, List<Tile> hand) {
 		board = b;
 		move = new Move();
-		myHand = hand;
 		
 		Random r = new Random();
 		List<Tile> possibleTiles = b.flattenBoard();
@@ -50,7 +48,6 @@ public class BasicBehaviour implements Behaviour {
 			Collections.shuffle(handCopy, r);
 			try {
 				move.addTile(b, handCopy.get(0), 0, 0);
-				//hand.remove(myHand.get(0));
 			} catch (InvalidMoveException e) { 
 				e.printStackTrace();
 			}
@@ -85,7 +82,6 @@ public class BasicBehaviour implements Behaviour {
 		if (BoardChecker.canPlaceTile(board, tileInHand, x, y)) {
 			try {
 				move.addTile(board, tileInHand, x, y);
-				//hand.remove(tileInHand);
 				result = true;
 			} catch (InvalidMoveException e) {
 				e.printStackTrace();
