@@ -89,10 +89,16 @@ public class Game {
 			if (cause != GameEndCause.NONE) {
 				stop(cause);
 			} else {
-				do {
-					currentPlayer = (currentPlayer + 1) % players.size();
-				} while (!BoardChecker.canMakeMoveWithTiles(board, 
-										players.get(currentPlayer).getHand()));
+				if (!players.isEmpty()) {
+					do {
+						try {
+							currentPlayer = (currentPlayer + 1) % players.size();
+						} catch (ArithmeticException e) {
+							break;
+						}
+					} while (bag.getSize() == 0 && !BoardChecker.canMakeMoveWithTiles(board, 
+													players.get(currentPlayer).getHand()));
+				}
 			}
 		}
 	}
@@ -103,6 +109,7 @@ public class Game {
 	//@ requires cause != null;
 	public void stop(GameEndCause cause) {
 		if (running) {
+			ui.update();
 			ui.gameOver(cause);
 			running = false;
 			ui.stop();

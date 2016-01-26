@@ -49,7 +49,6 @@ public class AIPlayer extends Player {
 				e.printStackTrace();
 			}
 		} else {
-			System.out.println("Trading!");
 			List<Tile> tiles = new ArrayList<Tile>(hand);
 			hand.clear();
 			try {

@@ -56,7 +56,7 @@ public class TUI implements UI {
 	 */
 	@Override
 	public void run() {
-		showCommandPrompt();
+		//showCommandPrompt();
 		while (running) {
 			try {
 				while (in.ready()) {
