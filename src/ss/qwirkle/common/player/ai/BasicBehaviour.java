@@ -51,7 +51,9 @@ public class BasicBehaviour implements Behaviour {
 			try {
 				move.addTile(b, handCopy.get(0), 0, 0);
 				//hand.remove(myHand.get(0));
-			} catch (InvalidMoveException e) { }
+			} catch (InvalidMoveException e) { 
+				e.printStackTrace();
+			}
 			result = true;
 		}
 		
@@ -80,12 +82,14 @@ public class BasicBehaviour implements Behaviour {
 		if (result) {
 			return;
 		}
-		if (!board.hasTile(x, y)) {
+		if (BoardChecker.canPlaceTile(board, tileInHand, x, y)) {
 			try {
 				move.addTile(board, tileInHand, x, y);
 				//hand.remove(tileInHand);
 				result = true;
-			} catch (InvalidMoveException e) { }
+			} catch (InvalidMoveException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }
