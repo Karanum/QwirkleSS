@@ -5,7 +5,6 @@ import java.util.List;
 
 import ss.qwirkle.common.Move;
 import ss.qwirkle.common.tiles.Tile;
-import ss.qwirkle.exceptions.NegativeArgumentException;
 
 /**
  * Abstract class representing a player in a Qwirkle match.
@@ -65,10 +64,7 @@ public abstract class Player {
 	 * @throws NegativeArgumentException If the points parameter is negative
 	 */
 	//@ ensures points >= 0 ==> getScore() == \old(getScore()) + points;
-	public void addScore(int points) throws NegativeArgumentException {
-		if (points < 0) {
-			throw new NegativeArgumentException();
-		}
+	public void addScore(int points) {
 		score += points;
 	}
 	

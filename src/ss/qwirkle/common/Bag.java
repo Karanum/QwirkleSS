@@ -58,6 +58,14 @@ public class Bag {
 	}
 	
 	/**
+	 * Returns all tiles in the bag. Does not remove them from the bag.
+	 */
+	//@ pure
+	public List<Tile> getAllTiles() {
+		return new ArrayList<Tile>(bag);
+	}
+	
+	/**
 	 * Adds tiles back into the bag.
 	 * @param tiles The list of tiles to add
 	 */

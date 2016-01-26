@@ -12,6 +12,11 @@ public interface UI extends Runnable {
 	public void run();
 	
 	/**
+	 * Stops the UI and cleans up the thread.
+	 */
+	public void stop();
+	
+	/**
 	 * Redraws the game elements on the screen.
 	 */
 	public void update();

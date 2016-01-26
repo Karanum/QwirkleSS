@@ -5,7 +5,6 @@ import java.util.List;
 
 import ss.qwirkle.common.player.HumanPlayer;
 import ss.qwirkle.common.player.Player;
-import ss.qwirkle.common.player.SocketPlayer;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.common.ui.UI;
 import ss.qwirkle.exceptions.InvalidMoveException;
@@ -19,6 +18,7 @@ import ss.qwirkle.exceptions.MoveOrderException;
 public class Game {
 	
 	public enum GameType { NONE, SINGLEPLAYER, CLIENT, SERVER };
+	public enum GameEndCause { NONE, EMPTY_HAND, NO_MOVES };
 	public static GameType type = GameType.NONE;
 	
 	//@ private invariant players != null && !players.isEmpty();
@@ -32,6 +32,7 @@ public class Game {
 	private UI ui;
 	private Board board;
 	private Bag bag;
+	private boolean running;
 	
 	/**
 	 * Creates a new Game object.
@@ -41,6 +42,7 @@ public class Game {
 		board = new Board();
 		bag = new Bag();
 		currentPlayer = 0;
+		running = false;
 	}
 	
 	/**
@@ -69,13 +71,32 @@ public class Game {
 	 * Starts the game with the current players.
 	 */
 	public void start() {
+		running = true;
 		for (Player p : players) {
 			giveTiles(p);
 		}
-		ui.update();
 		currentPlayer = 0;
-		players.get(0).determineMove();
-		ui.run();
+		(new Thread(ui)).start();
+		
+		while (running) {
+			Player player = players.get(currentPlayer);
+			if (localPlayer == null || player instanceof HumanPlayer) {
+				ui.update();
+			}
+			player.determineMove();
+			
+			GameEndCause end = testGameOver();
+			if (end != GameEndCause.NONE) {
+				System.out.println("Game Over!");
+				//TODO: Add different messages depending on the GameEndCause
+				//TODO: Determine winner or tie
+			} else {
+				do {
+					currentPlayer = (currentPlayer + 1) % players.size();
+				} while (!BoardChecker.canMakeMoveWithTiles(board, 
+										players.get(currentPlayer).getHand()));
+			}
+		}
 	}
 	
 	/**
@@ -89,11 +110,26 @@ public class Game {
 	}
 	
 	/**
-	 * Determines whether the game has ended and who the winner is.
+	 * Checks if the game should end, and if so, formally ends the game.
 	 */
-	//@ pure
-	public void determineWinner() {
-		//TODO: Create function body
+	public GameEndCause testGameOver() {
+		Player player = players.get(currentPlayer);
+		if (player.getHand().isEmpty() && bag.getSize() == 0) {
+			player.addScore(Player.MAX_HAND_SIZE);
+			running = false;
+			return GameEndCause.EMPTY_HAND;
+		}
+		
+		List<Tile> allGameTiles = bag.getAllTiles();
+		for (Player p : players) {
+			allGameTiles.addAll(p.getHand());
+		}
+		if (!BoardChecker.canMakeMoveWithTiles(board, allGameTiles)) {
+			running = false;
+			return GameEndCause.NO_MOVES;
+		}
+		
+		return GameEndCause.NONE;
 	}
 	
 	/**
@@ -125,6 +161,9 @@ public class Game {
 		}
 		giveTiles(p);
 		bag.returnTiles(tiles);
+		if (p.getHand().size() < Player.MAX_HAND_SIZE) {
+			giveTiles(p);
+		}
 	}
 	
 	/**
@@ -133,6 +172,21 @@ public class Game {
 	//@ pure
 	public Board getBoard() {
 		return board;
+	}
+	
+	/**
+	 * Returns the Bag object of this game.
+	 */
+	//@ pure
+	public Bag getBag() {
+		return bag;
+	}
+	
+	/**
+	 * Returns the list of players.
+	 */
+	public List<Player> getPlayers() {
+		return players;
 	}
 	
 	/**
@@ -157,6 +211,7 @@ public class Game {
 			throw new MoveOrderException();
 		}
 		board.doMove(move);
+		p.addScore(move.getPoints());
 		giveTiles(p);
 	}
 	

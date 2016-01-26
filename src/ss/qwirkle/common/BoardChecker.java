@@ -1,5 +1,7 @@
 package ss.qwirkle.common;
 
+import java.util.List;
+
 import ss.qwirkle.common.tiles.Pattern;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.util.Range;
@@ -177,6 +179,27 @@ public abstract class BoardChecker {
 			}
 		}
 		return true;
+	}
+	
+	public static boolean canMakeMoveWithTiles(Board b, List<Tile> tiles) {
+		if (b.isEmpty()) {
+			return true;
+		}
+		
+		List<Tile> boardTiles = b.flattenBoard();
+		for (Tile boardTile : boardTiles) {
+			int x = boardTile.getX();
+			int y = boardTile.getY();
+			for (Tile tile : tiles) {
+				if (canPlaceTile(b, tile, x - 1, y) ||
+								canPlaceTile(b, tile, x + 1, y) ||
+								canPlaceTile(b, tile, x, y - 1) ||
+								canPlaceTile(b, tile, x, y + 1)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 }

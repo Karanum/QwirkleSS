@@ -43,7 +43,6 @@ public class AIPlayer extends Player {
 		if (move.getTiles().size() > 0) {
 			try {
 				game.doMove(this, move);
-				game.nextTurn(this);
 			} catch (InvalidMoveException e) {
 				e.printStackTrace();
 			} catch (MoveOrderException e) {
@@ -55,7 +54,6 @@ public class AIPlayer extends Player {
 			hand.clear();
 			try {
 				game.tradeTiles(this, tiles);
-				game.nextTurn(this);
 			} catch (MoveOrderException e) {
 				e.printStackTrace();
 			}

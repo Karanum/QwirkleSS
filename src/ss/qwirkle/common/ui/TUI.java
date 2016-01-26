@@ -3,12 +3,14 @@ package ss.qwirkle.common.ui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import ss.qwirkle.common.Board;
 import ss.qwirkle.common.Game;
 import ss.qwirkle.common.Move;
 import ss.qwirkle.common.player.HumanPlayer;
+import ss.qwirkle.common.player.Player;
 import ss.qwirkle.common.tiles.Color;
 import ss.qwirkle.common.tiles.Shape;
 import ss.qwirkle.common.tiles.Tile;
@@ -20,7 +22,7 @@ import ss.qwirkle.util.Range;
  * A textual user interface for the Qwirkle game.
  * @author Karanum
  */
-public class TUI extends Thread implements UI {
+public class TUI implements UI {
 
 	private static final String CORNER = "+";
 	private static final String LINE_DELIM = "----";
@@ -58,12 +60,15 @@ public class TUI extends Thread implements UI {
 				while (in.ready()) {
 					String input = in.readLine();
 					parseInput(input);
-					showCommandPrompt();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void stop() {
+		running = false;
 	}
 	
 	/**
@@ -81,6 +86,7 @@ public class TUI extends Thread implements UI {
 	@Override
 	public void update() {
 		printGame();
+		showCommandPrompt();
 	}
 	
 	/**
@@ -132,6 +138,9 @@ public class TUI extends Thread implements UI {
 	private void printGame() {
 		printBoard();
 		if (game.getLocalPlayer() != null) {
+			System.out.println("\n");
+			printScores();
+			System.out.println("\nTiles in bag: " + game.getBag().getSize());
 			System.out.println("\n");
 			printHand();
 		}
@@ -218,6 +227,21 @@ public class TUI extends Thread implements UI {
 	}
 	
 	/**
+	 * Prints the scores of all players on the screen.
+	 */
+	private void printScores() {
+		HumanPlayer localPlayer = game.getLocalPlayer();
+		System.out.println("Your score: " + localPlayer.getScore());
+		
+		List<Player> players = game.getPlayers();
+		for (Player player : players) {
+			if (player != localPlayer) {
+				System.out.println(player.getName() + "'s score: " + player.getScore());
+			}
+		}
+	}
+	
+	/**
 	 * Prints the local player's hand on the screen.
 	 */
 	private void printHand() {
@@ -256,7 +280,7 @@ public class TUI extends Thread implements UI {
 					resetMove();
 					break;
 				case "trade":
-					//TODO: Implement tile trading function
+					tradeTiles(words);
 					break;
 				case "stop":
 					running = false;
@@ -268,6 +292,29 @@ public class TUI extends Thread implements UI {
 					System.out.println("Unknown command! Type 'help' for a list of commands");
 			}
 		}
+	}
+	
+	/**
+	 * Tries to trade tiles by scanning the user input for tile IDs.
+	 */
+	private void tradeTiles(String[] args) {
+		if (game.getBoard().isEmpty()) {
+			System.out.println("You may not trade tiles while the board is empty!");
+			return;
+		}
+		
+		List<Tile> tiles = new ArrayList<Tile>();
+		for (int i = 1; i < args.length; ++i) {
+			try {
+				int handId = Integer.parseInt(args[i]);
+				tiles.add(game.getLocalPlayer().getHand().get(handId - 1));
+			} catch (NumberFormatException e) {
+				System.out.println("Argument is not a number: " + args[i]);
+				return;
+			}
+		}
+		
+		game.getLocalPlayer().tradeTiles(tiles);
 	}
 	
 	/**

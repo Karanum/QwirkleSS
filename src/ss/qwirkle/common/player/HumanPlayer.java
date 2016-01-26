@@ -1,5 +1,6 @@
 package ss.qwirkle.common.player;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ public class HumanPlayer extends Player {
 	//@ private invariant game != null;
 	private Move move;
 	private Game game;
+	private boolean awaitingMove;
 	
 	/**
 	 * Creates a new human player with the specified name.
@@ -29,6 +31,19 @@ public class HumanPlayer extends Player {
 	public HumanPlayer(Game game, String name) {
 		super(name);
 		this.game = game;
+		awaitingMove = false;
+	}
+	
+	public void tradeTiles(List<Tile> tiles) {
+		List<Tile> handCopy = new ArrayList<Tile>(hand);
+		hand.removeAll(tiles);
+		try {
+			game.tradeTiles(this, tiles);
+			awaitingMove = false;
+		} catch (MoveOrderException e) {
+			System.out.println("ERROR: Player moved out of turn! Name: " + getName());
+			hand = handCopy;
+		}
 	}
 	
 	/**
@@ -37,6 +52,14 @@ public class HumanPlayer extends Player {
 	@Override
 	public void determineMove() {
 		move = new Move();
+		awaitingMove = true;
+		while (awaitingMove) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/**
@@ -68,7 +91,7 @@ public class HumanPlayer extends Player {
 		move = null;
 		try {
 			game.doMove(this, m);
-			game.nextTurn(this);
+			awaitingMove = false;
 		} catch (MoveOrderException e) {
 			System.out.println("ERROR: Player moved out of turn! Name: " + getName());
 		} catch (InvalidMoveException e) {

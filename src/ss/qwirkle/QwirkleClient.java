@@ -18,7 +18,7 @@ public class QwirkleClient {
 		
 		Game game = new Game();
 		game.setup(new TUI(game));
-		game.addPlayer(new AIPlayer(game, "Mark", new BasicBehaviour()));
+		game.addPlayer(new HumanPlayer(game, "Mark"));
 		game.addPlayer(new AIPlayer(game, "Dylan", new BasicBehaviour()));
 		game.start();
 	}

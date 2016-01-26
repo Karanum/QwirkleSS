@@ -1,8 +1,10 @@
 package ss.qwirkle.common;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import ss.qwirkle.common.tiles.Color;
 import ss.qwirkle.common.tiles.ColorPattern;
@@ -21,12 +23,10 @@ public class Move {
 	
 	private static int nextId = 0;
 	
-	//@ private invariant points >= 0;
 	//@ private invariant tiles != null;
 	//@ private invariant type != null;
 	//@ private invariant xRange != null;
 	//@ private invariant yRange != null;
-	private int points;
 	private List<Tile> tiles;
 	private MoveType type;
 	private Range xRange;
@@ -43,7 +43,6 @@ public class Move {
 	 */
 	public Move() {
 		tiles = new ArrayList<Tile>();
-		points = 0;
 		type = MoveType.SINGULAR;
 		
 		xRange = new Range();
@@ -58,7 +57,17 @@ public class Move {
 	 */
 	//@ pure
 	public int getPoints() {
-		//TODO: Implement proper point calculations :c
+		int points = 0;
+		Set<Pattern> patterns = new HashSet<Pattern>();
+		for (Tile tile : tiles) {
+			patterns.add(tile.getHorzPattern().orElse(null));
+			patterns.add(tile.getVertPattern().orElse(null));
+		}
+		for (Pattern p : patterns) {
+			if (p != null) {
+				points += p.getPoints();
+			}
+		}
 		return points;
 	}
 	
