@@ -8,6 +8,7 @@ import java.util.List;
 
 import nl.utwente.ewi.qwirkle.net.IProtocol;
 import ss.qwirkle.common.Move;
+import ss.qwirkle.common.player.Player;
 import ss.qwirkle.common.tiles.Tile;
 
 public class Server {
@@ -113,6 +114,13 @@ public class Server {
     	String message = IProtocol.SERVER_ERROR;
     	message += " " + error + " " + msg;
     	send(message);
+    }
+    public void winMessage(List<Player> players, String result ) {
+    	String message = IProtocol.SERVER_GAMEEND + " " + result;
+    	for (Player player : players) {
+    		int score = player.getScore();
+    		message += " " + score + "," + player.getName();
+    	}
     }
     private void send(String message) {
 		try {
