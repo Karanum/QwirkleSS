@@ -17,8 +17,18 @@ import ss.qwirkle.exceptions.MoveOrderException;
  */
 public class Game {
 	
+	/**
+	 * List of possible game types.
+	 * @author Karanum
+	 */
 	public enum GameType { NONE, SINGLEPLAYER, CLIENT, SERVER };
+	
+	/**
+	 * List of causes for the game to end.
+	 * @author Karanum
+	 */
 	public enum GameEndCause { NONE, EMPTY_HAND, NO_MOVES, ERROR };
+	
 	public static GameType type = GameType.NONE;
 	
 	//@ private invariant players != null && !players.isEmpty();

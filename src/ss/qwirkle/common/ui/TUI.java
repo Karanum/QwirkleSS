@@ -13,6 +13,7 @@ import ss.qwirkle.common.Game.GameEndCause;
 import ss.qwirkle.common.Move;
 import ss.qwirkle.common.player.HumanPlayer;
 import ss.qwirkle.common.player.Player;
+import ss.qwirkle.common.player.ai.BasicBehaviour;
 import ss.qwirkle.common.tiles.Color;
 import ss.qwirkle.common.tiles.Shape;
 import ss.qwirkle.common.tiles.Tile;
@@ -56,7 +57,6 @@ public class TUI implements UI {
 	 */
 	@Override
 	public void run() {
-		showCommandPrompt();
 		while (running) {
 			try {
 				while (in.ready()) {
@@ -213,19 +213,27 @@ public class TUI implements UI {
 		String borderLine = LINE_DELIM + CORNER;
 		for (int i = 0; i < xRange.forEach().size(); ++i) {
 			markerLine += " ";
-			int firstChar = (i / 26) - 1;
-			int secondChar = i % 26;
-			if (firstChar < 0) {
-				markerLine += " ";
-			} else {
-				markerLine += (char) (firstChar + 65);
+			String column = makeColumn(i);
+			if (column.length() < 2) {
+				column = " " + column;
 			}
-			markerLine += (char) (secondChar + 65);
+			markerLine += column;
 			markerLine += " " + TILE_DELIM;
 			borderLine += LINE_DELIM + CORNER;
 		}
 		System.out.println(markerLine);
 		System.out.println(borderLine);
+	}
+	
+	private String makeColumn(int x) {
+		String result = "";
+		int firstChar = (x / 26) - 1;
+		int secondChar = x % 26;
+		if (firstChar >= 0) {
+			result += (char) (firstChar + 65);
+		}
+		result += (char) (secondChar + 65);
+		return result;
 	}
 	
 	/**
@@ -285,7 +293,7 @@ public class TUI implements UI {
 					tradeTiles(words);
 					break;
 				case "hint":
-					//TODO: Implement hint functionality
+					giveHint();
 					break;
 				case "stop":
 					game.stop(GameEndCause.ERROR);
@@ -298,6 +306,40 @@ public class TUI implements UI {
 					System.out.println("Unknown command! Type 'help' for a list of commands");
 			}
 		}
+	}
+	
+	private void giveHint() {
+		if (game.getLocalPlayer() == null) {
+			System.out.println("Can only use this when there's a human player!");
+			return;
+		}
+		
+		Move currentMove = game.getLocalPlayer().getCurrentMove().orElse(null);
+		if (currentMove != null && !currentMove.getTiles().isEmpty()) {
+			System.out.println("I only give hints at the start of your turn!");
+			return;
+		}
+		
+		Move move = new BasicBehaviour()
+						.getPossibleMove(game.getBoard(), game.getLocalPlayer().getHand());
+		if (move.getTiles().isEmpty()) {
+			System.out.println("No moves possible! Trade away!");
+			return;
+		}
+		Tile tile = move.getTiles().get(0);
+		int x = tile.getX() - game.getBoard().getXRange().getMin() + 1;
+		int y = tile.getY() - game.getBoard().getYRange().getMin() + 1;
+		String tileString = getTileString(tile);
+		System.out.println("You could place " + tileString + " at " + makeColumn(x - 1) + y);
+		/*
+		 * int firstChar = (i / 26) - 1;
+			int secondChar = i % 26;
+			if (firstChar < 0) {
+				markerLine += " ";
+			} else {
+				markerLine += (char) (firstChar + 65);
+			}
+		 */
 	}
 	
 	/**
