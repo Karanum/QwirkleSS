@@ -61,7 +61,6 @@ public abstract class Player {
 	/**
 	 * Increments the score of the player.
 	 * @param points The amount to increment the score by
-	 * @throws NegativeArgumentException If the points parameter is negative
 	 */
 	//@ ensures points >= 0 ==> getScore() == \old(getScore()) + points;
 	public void addScore(int points) {

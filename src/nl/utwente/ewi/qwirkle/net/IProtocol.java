@@ -9,8 +9,8 @@ package nl.utwente.ewi.qwirkle.net;
  * <p>Tiles are represented by an integer. There are 6 colors and 6 shapes to be
  * identified, resulting in 36 different combinations. First, we define the colors
  * and shapes as integers from <code>0</code> to <code>5</code>. Using the formula
- * <strong><code>color * 6 + shape</code></strong> we can calculate the integer for the Tile. It does
- * not matter which shape or color is defined by which integer, as long as it is
+ * <strong><code>color * 6 + shape</code></strong> we can calculate the integer for the Tile. 
+ * It does not matter which shape or color is defined by which integer, as long as it is
  * done consistently.</p>
  *
  * <h3>Changelog</h3>
