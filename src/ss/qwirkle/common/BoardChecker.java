@@ -108,22 +108,39 @@ public abstract class BoardChecker {
 		Tile tileDown = board.getTile(x, y + 1).orElse(null);
 		Tile tileLeft = board.getTile(x - 1, y).orElse(null);
 		Tile tileRight = board.getTile(x + 1, y).orElse(null);
-		if (tileUp != null && !canConnectVertPattern(tile, tileUp)) {
-			return false;
-		}
-		if (tileDown != null && !canConnectVertPattern(tile, tileDown)) {
-			return false;
-		}
-		if (tileLeft != null && !canConnectHorzPattern(tile, tileLeft)) {
-			return false;
-		}
-		if (tileRight != null && !canConnectHorzPattern(tile, tileRight)) {
+		if (!checkPatternsAdjacent(tile, tileUp, tileDown, tileLeft, tileRight)) {
 			return false;
 		}
 		if (tileUp != null && tileDown != null && !canConnectVertPattern(tileUp, tileDown)) {
 			return false;
 		}
 		if (tileLeft != null && tileRight != null && !canConnectHorzPattern(tileLeft, tileRight)) {
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Checks the patterns of a tile against the tiles around it.
+	 * @param self The center tile
+	 * @param tileUp The tile above the center tile
+	 * @param tileDown The tile below the center tile
+	 * @param tileLeft The tile left of the center tile
+	 * @param tileRight The tile right of the center tile
+	 * @return
+	 */
+	private static boolean checkPatternsAdjacent(Tile self, Tile tileUp, Tile tileDown, 
+												Tile tileLeft, Tile tileRight) {
+		if (tileUp != null && !canConnectVertPattern(self, tileUp)) {
+			return false;
+		}
+		if (tileDown != null && !canConnectVertPattern(self, tileDown)) {
+			return false;
+		}
+		if (tileLeft != null && !canConnectHorzPattern(self, tileLeft)) {
+			return false;
+		}
+		if (tileRight != null && !canConnectHorzPattern(self, tileRight)) {
 			return false;
 		}
 		return true;

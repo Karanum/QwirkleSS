@@ -381,10 +381,10 @@ public class TUI implements UI {
 	//@ requires input != null;
 	private int parseColumn(String input) {
 		int result = -1;
-		char[] chars = input.toCharArray();
+		char[] chars = input.toUpperCase().toCharArray();
 		for (char c : chars) {
 			if (c < 'A' || c > 'Z') {
-				System.out.println("Only use uppercase A-Z for column names!");
+				System.out.println("Only use A-Z for column names!");
 				return -1;
 			}
 			result = (result + 1) * 26;

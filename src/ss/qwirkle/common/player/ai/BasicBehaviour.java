@@ -17,67 +17,67 @@ import ss.qwirkle.exceptions.InvalidMoveException;
  */
 public class BasicBehaviour implements Behaviour {
 
+	private Board board;
+	private List<Tile> hand;
+	private List<Tile> myHand;
+	private boolean result;
+	private Move move;
+	
 	/**
 	 * Asks the behaviour to determine a move.
 	 */
 	@Override
 	public Move determineMove(Board b, List<Tile> hand) {
-		List<Tile> possibleTiles = b.flattenBoard();
+		board = b;
+		move = new Move();
+		this.hand = hand;
+		
 		Random r = new Random();
-		Move move = new Move();
+		List<Tile> possibleTiles = b.flattenBoard();
 		Collections.shuffle(possibleTiles, r);
 		
-		boolean result = false;
+		result = false;
 		if (b.isEmpty()) {
-			List<Tile> myTiles = new ArrayList<Tile>(hand);
-			Collections.shuffle(myTiles, r);
+			myHand = new ArrayList<Tile>(hand);
+			Collections.shuffle(myHand, r);
 			try {
-				move.addTile(b, myTiles.get(0), 0, 0);
-				hand.remove(myTiles.get(0));
+				move.addTile(b, myHand.get(0), 0, 0);
+				hand.remove(myHand.get(0));
 			} catch (InvalidMoveException e) { }
 			result = true;
 		}
 		
 		while (!result) {
-			//for (Tile boardTile : possibleTiles) {
 			for (int i = 0; i < possibleTiles.size(); ++i) {
 				Tile boardTile = possibleTiles.get(i);
 				int x = boardTile.getX();
 				int y = boardTile.getY();
-				List<Tile> myTiles = new ArrayList<Tile>(hand);
-				Collections.shuffle(myTiles, r);
-				for (int j = myTiles.size() - 1; j >= 0 && !result; --j) {
-					Tile tile = myTiles.get(j);
+				myHand = new ArrayList<Tile>(hand);
+				Collections.shuffle(myHand, r);
+				for (int j = myHand.size() - 1; j >= 0 && !result; --j) {
+					Tile tile = myHand.get(j);
 					
-					if (!b.hasTile(x + 1, y)) {
-						try {
-							move.addTile(b, tile, x + 1, y);
-							hand.remove(myTiles.get(j));
-							result = true;
-						} catch (InvalidMoveException e) { }
-					} else if (!b.hasTile(x - 1, y)) {
-						try {
-							move.addTile(b, tile, x - 1, y);
-							hand.remove(myTiles.get(j));
-							result = true;
-						} catch (InvalidMoveException e) { }
-					} else if (!b.hasTile(x, y - 1)) {
-						try {
-							move.addTile(b, tile, x, y - 1);
-							hand.remove(myTiles.get(j));
-							result = true;
-						} catch (InvalidMoveException e) { }
-					} else if (!b.hasTile(x, y + 1)) {
-						try {
-							move.addTile(b, tile, x, y + 1);
-							hand.remove(myTiles.get(j));
-							result = true;
-						} catch (InvalidMoveException e) { }
-					}
+					checkTile(x + 1, y, tile);
+					checkTile(x - 1, y, tile);
+					checkTile(x, y + 1, tile);
+					checkTile(x, y - 1, tile);
 				}	
 			}
 			result = true;
 		}
 		return move;
+	}
+	
+	private void checkTile(int x, int y, Tile tileInHand) {
+		if (result) {
+			return;
+		}
+		if (!board.hasTile(x, y)) {
+			try {
+				move.addTile(board, tileInHand, x, y);
+				hand.remove(tileInHand);
+				result = true;
+			} catch (InvalidMoveException e) { }
+		}
 	}
 }

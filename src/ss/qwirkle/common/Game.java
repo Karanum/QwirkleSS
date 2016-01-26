@@ -18,7 +18,7 @@ import ss.qwirkle.exceptions.MoveOrderException;
 public class Game {
 	
 	public enum GameType { NONE, SINGLEPLAYER, CLIENT, SERVER };
-	public enum GameEndCause { NONE, EMPTY_HAND, NO_MOVES };
+	public enum GameEndCause { NONE, EMPTY_HAND, NO_MOVES, ERROR };
 	public static GameType type = GameType.NONE;
 	
 	//@ private invariant players != null && !players.isEmpty();
@@ -27,11 +27,12 @@ public class Game {
 	//@ private invariant board != null;
 	//@ private invariant bag != null;
 	private List<Player> players;
-	private int currentPlayer;
 	private HumanPlayer localPlayer;
 	private UI ui;
 	private Board board;
 	private Bag bag;
+	
+	private int currentPlayer;
 	private boolean running;
 	
 	/**
