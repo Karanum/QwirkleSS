@@ -6,11 +6,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.utwente.ewi.qwirkle.net.IProtocol;
-import ss.qwirkle.common.Move;
-import ss.qwirkle.common.player.Player;
-import ss.qwirkle.common.tiles.Tile;
-
 public class Server {
     private static final String USAGE
             = "usage: " + Server.class.getName() + " <port>";
@@ -71,11 +66,11 @@ public class Server {
      * to all connected Clients.
      * @param msg message that is send
      */
-    public void broadcast(String msg) {
-    	print(msg);
+    public void broadcast(String message) {
+    	print(message);
         for (ClientHandler thread : threads) {
         	if (thread != null) {
-        		thread.sendMessage(msg);
+        		thread.sendMessage(message);
         	}
         }
     }
@@ -95,40 +90,4 @@ public class Server {
     public void removeHandler(ClientHandler handler) {
         threads.remove(handler);
     }
-    public void drawPlayerTile(List<Tile> tiles) {
-    	String message = IProtocol.SERVER_DRAWTILE;
-    	for (Tile t : tiles) {
-    		message += " " + t.toInt();
-    	}
-    	send(message);
-    	
-    }
-    public void putMove(Move m) {
-    	String message = IProtocol.SERVER_MOVE_PUT;
-		for (Tile t : m.getTiles()) {
-			message += String.format(" %d@%d,%d", t.toInt(), t.getX(), t.getY());
-		}
-		send(message);
-    }
-    public void sendError(IProtocol.Error error, String msg) {
-    	String message = IProtocol.SERVER_ERROR;
-    	message += " " + error + " " + msg;
-    	send(message);
-    }
-    public void winMessage(List<Player> players, String result ) {
-    	String message = IProtocol.SERVER_GAMEEND + " " + result;
-    	for (Player player : players) {
-    		int score = player.getScore();
-    		message += " " + score + "," + player.getName();
-    	}
-    }
-    private void send(String message) {
-		try {
-			out.write(message);
-			out.newLine();
-			out.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 }

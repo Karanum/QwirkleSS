@@ -73,11 +73,6 @@ public class Client extends Thread {
 		}
 		send(message);
 	}
-	public void tradeTile(int amount) {
-		String message = IProtocol.SERVER_MOVE_TRADE;
-		message += " " + amount;
-		send(message);
-	}
 	public void tradeMove(List<Tile> tiles) {
 		String message = IProtocol.CLIENT_MOVE_TRADE;
 		for (Tile t: tiles) {
@@ -123,7 +118,30 @@ public class Client extends Thread {
 			e.printStackTrace();
 		}
 	}
-	public void parseCommands() {
-		//startGame();
+	public void parseCommands(String message) {
+		String[] args = message.split(" ");
+		switch (args[0].toUpperCase()) {
+			case IProtocol.SERVER_DRAWTILE:
+				
+				break;
+			case IProtocol.SERVER_MOVE_PUT:
+				break;
+			case IProtocol.SERVER_ERROR:
+				break;
+			case IProtocol.SERVER_GAMEEND:
+				break;
+			case IProtocol.SERVER_GAMESTART:
+				break;
+			case IProtocol.SERVER_IDENTIFY:
+				break;
+			case IProtocol.SERVER_MOVE_TRADE:
+				break;
+			case IProtocol.SERVER_TURN:
+				break;
+			case IProtocol.SERVER_PASS:
+				break;
+			case IProtocol.SERVER_QUEUE:
+				break;
+		}
 	}
 }
