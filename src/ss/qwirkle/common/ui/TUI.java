@@ -4,10 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import ss.qwirkle.common.Board;
 import ss.qwirkle.common.Game;
+import ss.qwirkle.common.Game.GameEndCause;
 import ss.qwirkle.common.Move;
 import ss.qwirkle.common.player.HumanPlayer;
 import ss.qwirkle.common.player.Player;
@@ -15,6 +17,7 @@ import ss.qwirkle.common.tiles.Color;
 import ss.qwirkle.common.tiles.Shape;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.exceptions.InvalidMoveException;
+import ss.qwirkle.util.PlayerScoreComparator;
 import ss.qwirkle.util.Range;
 
 
@@ -50,7 +53,6 @@ public class TUI implements UI {
 	
 	/**
 	 * Starts polling for user input.
-	 * To make use of multithreading, call start() instead.
 	 */
 	@Override
 	public void run() {
@@ -282,7 +284,11 @@ public class TUI implements UI {
 				case "trade":
 					tradeTiles(words);
 					break;
+				case "hint":
+					//TODO: Implement hint functionality
+					break;
 				case "stop":
+					game.stop(GameEndCause.ERROR);
 					running = false;
 					break;
 				case "help":
@@ -451,7 +457,39 @@ public class TUI implements UI {
 		System.out.printf("%-25s - %s\n", "RESET", "Return the tiles you placed to your hand");
 		System.out.printf("%-25s - %s\n", "TRADE (tiles...)", 
 								"Trade some of the tiles in your hand (e.g. TRADE 1 2 5 6)");
+		System.out.printf("%-25s - %s\n", "HINT", "Gives a hint about a possible move");
 		System.out.printf("%-25s - %s\n", "STOP", "Quit the current game");
 		System.out.printf("%-25s - %s\n", "HELP", "Shows a list of available commands");
+	}
+
+	/**
+	 * Shows a game over message with the game results.
+	 */
+	@Override
+	public void gameOver(GameEndCause cause) {
+		System.out.println("\n========== GAME OVER ==========");
+		if (cause == GameEndCause.EMPTY_HAND) {
+			System.out.println("A player was out of tiles! The game has ended!");
+		} else if (cause == GameEndCause.NO_MOVES) {
+			System.out.println("No more moves possible! The game has ended!");
+		} else {
+			System.out.println("The game has been ended prematurely!");
+		}
+		System.out.println("\nScores:");
+		
+		List<Player> players = game.getPlayers();
+		Collections.sort(players, new PlayerScoreComparator());
+		Collections.reverse(players);
+		for (Player p : players) {
+			System.out.println("- " + p.getName() + "'s points: " + p.getScore());
+		}
+		
+		if (cause != GameEndCause.ERROR) {
+			if (players.size() > 1 && players.get(0).getScore() > players.get(1).getScore()) {
+				System.out.println("\nPlayer " + players.get(0).getName() + " has won!");
+			} else {
+				System.out.println("\nIt's a draw!");
+			}
+		}
 	}
 }

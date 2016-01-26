@@ -13,6 +13,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import ss.qwirkle.common.Game.GameEndCause;
+
 /**
  * A quick GUI test.
  * NOTE: Does not function the way it should! Please do not use!
@@ -91,13 +93,11 @@ public class GUI implements UI, ActionListener {
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -115,7 +115,11 @@ public class GUI implements UI, ActionListener {
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameOver(GameEndCause cause) {
 		
 	}
 

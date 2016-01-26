@@ -18,8 +18,8 @@ import ss.qwirkle.exceptions.InvalidMoveException;
 public class BasicBehaviour implements Behaviour {
 
 	private Board board;
-	private List<Tile> hand;
 	private List<Tile> myHand;
+	private List<Tile> handCopy;
 	private boolean result;
 	private Move move;
 	
@@ -28,9 +28,17 @@ public class BasicBehaviour implements Behaviour {
 	 */
 	@Override
 	public Move determineMove(Board b, List<Tile> hand) {
+		move = getPossibleMove(b, hand);
+		for (Tile tile : move.getTiles()) {
+			hand.remove(tile);
+		}
+		return move;
+	}
+	
+	public Move getPossibleMove(Board b, List<Tile> hand) {
 		board = b;
 		move = new Move();
-		this.hand = hand;
+		myHand = hand;
 		
 		Random r = new Random();
 		List<Tile> possibleTiles = b.flattenBoard();
@@ -38,11 +46,11 @@ public class BasicBehaviour implements Behaviour {
 		
 		result = false;
 		if (b.isEmpty()) {
-			myHand = new ArrayList<Tile>(hand);
-			Collections.shuffle(myHand, r);
+			handCopy = new ArrayList<Tile>(hand);
+			Collections.shuffle(handCopy, r);
 			try {
-				move.addTile(b, myHand.get(0), 0, 0);
-				hand.remove(myHand.get(0));
+				move.addTile(b, handCopy.get(0), 0, 0);
+				//hand.remove(myHand.get(0));
 			} catch (InvalidMoveException e) { }
 			result = true;
 		}
@@ -52,10 +60,10 @@ public class BasicBehaviour implements Behaviour {
 				Tile boardTile = possibleTiles.get(i);
 				int x = boardTile.getX();
 				int y = boardTile.getY();
-				myHand = new ArrayList<Tile>(hand);
-				Collections.shuffle(myHand, r);
-				for (int j = myHand.size() - 1; j >= 0 && !result; --j) {
-					Tile tile = myHand.get(j);
+				handCopy = new ArrayList<Tile>(hand);
+				Collections.shuffle(handCopy, r);
+				for (int j = handCopy.size() - 1; j >= 0 && !result; --j) {
+					Tile tile = handCopy.get(j);
 					
 					checkTile(x + 1, y, tile);
 					checkTile(x - 1, y, tile);
@@ -75,7 +83,7 @@ public class BasicBehaviour implements Behaviour {
 		if (!board.hasTile(x, y)) {
 			try {
 				move.addTile(board, tileInHand, x, y);
-				hand.remove(tileInHand);
+				//hand.remove(tileInHand);
 				result = true;
 			} catch (InvalidMoveException e) { }
 		}

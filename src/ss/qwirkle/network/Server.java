@@ -123,12 +123,12 @@ public class Server {
     	}
     }
     private void send(String message) {
-		try {
-			out.write(message);
-			out.newLine();
-			out.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			out.write(message);
+//			out.newLine();
+//			out.flush();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 }

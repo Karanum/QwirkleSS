@@ -82,6 +82,13 @@ public class HumanPlayer extends Player {
 	}
 	
 	/**
+	 * Forcefully aborts the player's turn, in case the game ends for example.
+	 */
+	public void abortMove() {
+		awaitingMove = false;
+	}
+	
+	/**
 	 * Finishes the player's move, sending it to the game for checking.
 	 */
 	//@ requires getCurrentMove().orElse(null) != null;

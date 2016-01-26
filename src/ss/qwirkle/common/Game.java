@@ -22,7 +22,6 @@ public class Game {
 	public static GameType type = GameType.NONE;
 	
 	//@ private invariant players != null && !players.isEmpty();
-	//@ private invariant Game.type != SERVER ==> localPlayer != null;
 	//@ private invariant ui != null;
 	//@ private invariant board != null;
 	//@ private invariant bag != null;
@@ -86,11 +85,9 @@ public class Game {
 			}
 			player.determineMove();
 			
-			GameEndCause end = testGameOver();
-			if (end != GameEndCause.NONE) {
-				System.out.println("Game Over!");
-				//TODO: Add different messages depending on the GameEndCause
-				//TODO: Determine winner or tie
+			GameEndCause cause = testGameOver();
+			if (cause != GameEndCause.NONE) {
+				stop(cause);
 			} else {
 				do {
 					currentPlayer = (currentPlayer + 1) % players.size();
@@ -101,10 +98,29 @@ public class Game {
 	}
 	
 	/**
+	 * Stops the game and tells the UI to show the results.
+	 */
+	//@ requires cause != null;
+	public void stop(GameEndCause cause) {
+		if (running) {
+			ui.gameOver(cause);
+			running = false;
+			ui.stop();
+			dispose();
+		}
+	}
+	
+	/**
 	 * Clears up unused resources at the end of a game.
 	 */
 	//@ ensures getBoard().isEmpty();
+	//@ ensures getPlayers().size() == 0;
+	//@ ensures getLocalPlayer() == null;
 	public void dispose() {
+		if (localPlayer != null) {
+			localPlayer.abortMove();
+			localPlayer = null;
+		}
 		players.clear();
 		board = new Board();
 		bag = new Bag();
@@ -114,10 +130,13 @@ public class Game {
 	 * Checks if the game should end, and if so, formally ends the game.
 	 */
 	public GameEndCause testGameOver() {
+		if (!running) {
+			return GameEndCause.ERROR;
+		}
+		
 		Player player = players.get(currentPlayer);
 		if (player.getHand().isEmpty() && bag.getSize() == 0) {
 			player.addScore(Player.MAX_HAND_SIZE);
-			running = false;
 			return GameEndCause.EMPTY_HAND;
 		}
 		
@@ -126,7 +145,6 @@ public class Game {
 			allGameTiles.addAll(p.getHand());
 		}
 		if (!BoardChecker.canMakeMoveWithTiles(board, allGameTiles)) {
-			running = false;
 			return GameEndCause.NO_MOVES;
 		}
 		
@@ -186,6 +204,7 @@ public class Game {
 	/**
 	 * Returns the list of players.
 	 */
+	//@ pure
 	public List<Player> getPlayers() {
 		return players;
 	}
@@ -214,23 +233,6 @@ public class Game {
 		board.doMove(move);
 		p.addScore(move.getPoints());
 		giveTiles(p);
-	}
-	
-	/**
-	 * Tells the game to advance to the next player's turn.
-	 * @param p The player trying to end their turn
-	 * @throws MoveOrderException Throws this when the player tries to act out of turn
-	 */
-	public void nextTurn(Player p) throws MoveOrderException {
-		if (p != players.get(currentPlayer)) {
-			throw new MoveOrderException();
-		}
-		ui.update();
-		++currentPlayer;
-		if (currentPlayer >= players.size()) {
-			currentPlayer = 0;
-		}
-		players.get(currentPlayer).determineMove();
 	}
 	
 }

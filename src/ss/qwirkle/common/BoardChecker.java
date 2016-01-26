@@ -198,6 +198,13 @@ public abstract class BoardChecker {
 		return true;
 	}
 	
+	/**
+	 * Checks if a move can be made with the given list of tiles.
+	 * @param b The board instance to check this on
+	 * @param tiles The list of tiles to check
+	 */
+	//@ requires b != null && tiles != null;
+	//@ ensures b.isEmpty() ==> \result;
 	public static boolean canMakeMoveWithTiles(Board b, List<Tile> tiles) {
 		if (b.isEmpty()) {
 			return true;
