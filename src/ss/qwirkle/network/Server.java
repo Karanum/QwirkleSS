@@ -69,13 +69,13 @@ public class Server {
     /**
      * Sends a message using the collection of connected ClientHandlers
      * to all connected Clients.
-     * @param msg message that is send
+     * @param message message that is send
      */
-    public void broadcast(String msg) {
-    	print(msg);
+    public void broadcast(String message) {
+    	print(message);
         for (ClientHandler thread : threads) {
         	if (thread != null) {
-        		thread.sendMessage(msg);
+        		thread.sendMessage(message);
         	}
         }
     }
@@ -95,6 +95,7 @@ public class Server {
     public void removeHandler(ClientHandler handler) {
         threads.remove(handler);
     }
+
     public void drawPlayerTile(List<Tile> tiles) {
     	String message = IProtocol.SERVER_DRAWTILE;
     	for (Tile t : tiles) {
