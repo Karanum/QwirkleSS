@@ -160,6 +160,19 @@ public class ClientGame extends Game {
 	public Player getLocalPlayer() {
 		return localPlayer;
 	}
+	
+	/**
+	 * Sets the current player whose turn it is.
+	 * @param name The name of the current player
+	 */
+	//@ requires name != null;
+	@Override
+	public void setCurrentPlayer(String name) {
+		super.setCurrentPlayer(name);
+		if (getCurrentPlayer() == localPlayer) {
+			localPlayer.determineMove();
+		}
+	}
 
 	@Override
 	public void tradeTiles(Player p, List<Tile> tiles) throws MoveOrderException {
