@@ -82,9 +82,8 @@ public class QwirkleClient {
 		
 		ClientGame game = new ClientGame();
 		Client client = new Client(game, hostname, port);
-		if (client != null) {
-			client.start();
-		}
+		client.start();
+		game.setup(new TUI(game), client, players);
 		game.start();
 		
 		try {
