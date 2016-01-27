@@ -402,10 +402,12 @@ public class Client extends Thread {
 		
 		List<Tile> tiles = new ArrayList<Tile>();
 		for (int i = 1; i < args.length; ++i) {
+			System.out.println("Got tile: " + args[i]);
 			int tileInt = Integer.parseInt(args[i]);
 			tiles.add(new Tile(tileInt));
 		}
 		game.getLocalPlayer().addTilesToHand(tiles);
+		game.getUI().update();
 	}
 	
 	/**

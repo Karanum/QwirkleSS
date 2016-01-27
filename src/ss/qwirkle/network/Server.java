@@ -113,6 +113,9 @@ public class Server {
     	if (handler.getPlayerName() != null) {
     		names.remove(handler.getPlayerName());
     	}
+    	queue2Players.remove(handler);
+    	queue3Players.remove(handler);
+    	queue4Players.remove(handler);
         threads.remove(handler);
     }
     
