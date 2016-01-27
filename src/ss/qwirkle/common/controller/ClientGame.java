@@ -6,6 +6,7 @@ import java.util.List;
 import nl.utwente.ewi.qwirkle.net.IProtocol;
 import nl.utwente.ewi.qwirkle.net.IProtocol.Feature;
 import ss.qwirkle.QwirkleClient;
+import ss.qwirkle.common.BoardChecker;
 import ss.qwirkle.common.Move;
 import ss.qwirkle.common.player.HumanPlayer;
 import ss.qwirkle.common.player.Player;
@@ -197,6 +198,10 @@ public class ClientGame extends Game {
 			throw new MoveOrderException();
 		}
 		client.sendMove(move);
+	}
+	
+	public void doRemoteMove(Player p, Move move) throws InvalidMoveException, MoveOrderException {
+		super.doMove(p, move);
 	}
 	
 }

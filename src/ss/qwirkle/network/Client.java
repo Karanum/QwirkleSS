@@ -368,7 +368,7 @@ public class Client extends Thread {
 		}
 		
 		try {
-			game.doMove(game.getCurrentPlayer(), move);
+			game.doRemoteMove(game.getCurrentPlayer(), move);
 			game.getUI().update();
 		} catch (InvalidMoveException e) {
 			game.getUI().showMessage("ERROR: Server permitted a move that's not allowed!");
