@@ -23,7 +23,7 @@ public class HumanPlayer extends Player {
 	private Game game;
 	private boolean awaitingMove;
 	
-	private List<Tile> tradedTiles;
+	private List<Tile> playedTiles;
 	
 	/**
 	 * Creates a new human player with the specified name.
@@ -38,14 +38,14 @@ public class HumanPlayer extends Player {
 	}
 	
 	public void tradeTiles(List<Tile> tiles) {
-		tradedTiles = new ArrayList<Tile>(tiles);
+		playedTiles = new ArrayList<Tile>(tiles);
 		hand.removeAll(tiles);
 		try {
 			game.tradeTiles(this, tiles);
 			awaitingMove = false;
 		} catch (MoveOrderException e) {
 			System.out.println("ERROR: Player moved out of turn! Name: " + getName());
-			hand.addAll(tradedTiles);
+			hand.addAll(playedTiles);
 		}
 	}
 	
@@ -55,8 +55,20 @@ public class HumanPlayer extends Player {
 	//@ requires message != null;
 	@Override
 	public void tradeFailed(String message) {
-		hand.addAll(tradedTiles);
+		hand.addAll(playedTiles);
 		game.getUI().showMessage(message);
+		awaitingMove = true;
+	}
+	
+	/**
+	 * Used by the network client to notify that the player's move failed.
+	 */
+	//@ requires message != null;
+	@Override
+	public void moveFailed(String message) {
+		hand.addAll(playedTiles);
+		game.getUI().showMessage(message);
+		awaitingMove = true;
 	}
 	
 	/**
@@ -88,6 +100,9 @@ public class HumanPlayer extends Player {
 	//@ requires 0 <= handIndex && handIndex < Player.MAX_HAND_SIZE;
 	//@ ensures getCurrentMove().orElse(null) == null ==> !\result;
 	public boolean makeMove(int handIndex, int x, int y) throws InvalidMoveException {
+		if (!awaitingMove) {
+			return false;
+		}
 		if (move == null || handIndex >= hand.size()) {
 			return false;
 		}
@@ -110,7 +125,11 @@ public class HumanPlayer extends Player {
 	//@ requires getCurrentMove().orElse(null) != null;
 	//@ ensures getCurrentMove().orElse(null) == null;
 	public void finishMove() throws InvalidMoveException {
+		if (!awaitingMove) {
+			return;
+		}
 		Move m = move;
+		playedTiles = move.getTiles();
 		move = null;
 		try {
 			game.doMove(this, m);

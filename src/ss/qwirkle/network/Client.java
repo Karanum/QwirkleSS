@@ -19,7 +19,6 @@ import ss.qwirkle.common.Move;
 import ss.qwirkle.common.controller.ClientGame;
 import ss.qwirkle.common.controller.Game.GameEndCause;
 import ss.qwirkle.common.player.Player;
-import ss.qwirkle.common.player.HumanPlayer;
 import ss.qwirkle.common.player.ServerPlayer;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.exceptions.InvalidMoveException;
@@ -64,6 +63,14 @@ public class Client extends Thread {
 	}
 	
 	/**
+	 * Returns whether the client is connected and running.
+	 */
+	//@ pure
+	public boolean isRunning() {
+		return running;
+	}
+	
+	/**
 	 * Sends a message to the connected server.
 	 * @param message The message to send, should follow the protocol
 	 * @see nl.utwente.ewi.qwirkle.net.IProtocol IProtocol
@@ -77,6 +84,7 @@ public class Client extends Thread {
 		} catch (IOException e) {
 			System.out.println("Connection has been lost.");
 			shutdown();
+			game.stop(GameEndCause.ERROR);
 		}
     }
 	
@@ -109,6 +117,7 @@ public class Client extends Thread {
 			} catch (IOException e) {
 				System.out.println("Connection has been lost.");
 				shutdown();
+				game.stop(GameEndCause.ERROR);
 			}
 		}
 	}
@@ -124,7 +133,7 @@ public class Client extends Thread {
 			message += String.format(" %d@%d,%d", t.toInt(), t.getX(), t.getY());
 		}
 		sendMessage(message);
-	} //TODO: Call this function
+	}
 	
 	/**
 	 * Sends a trade to the server.
@@ -137,7 +146,7 @@ public class Client extends Thread {
 			message += " " + t.toInt();
 		}
 		sendMessage(message);
-	} //TODO: Call this function
+	}
 	
 	/**
 	 * Asks the server to add this client to the queue.
@@ -163,7 +172,7 @@ public class Client extends Thread {
 	public void quitPlayer() {
 		String message = IProtocol.CLIENT_QUIT;
 		sendMessage(message);
-	} //TODO: Call this function
+	}
 	
 	/**
 	 * Identifies the player to the server.
@@ -187,7 +196,6 @@ public class Client extends Thread {
 	/**
 	 * Returns whether the client's message buffer contains any messages.
 	 */
-	//@ ensures \result == !buffer.isEmpty();
 	//@ pure
 	public boolean hasNext() {
 		return !buffer.isEmpty();
@@ -211,7 +219,7 @@ public class Client extends Thread {
 	//@ requires message != null;
 	public void parseCommand(String message) {
 		String[] args = message.split(" ");
-		switch (args[0].toUpperCase()) {
+		switch (args[0]) {
 			case IProtocol.SERVER_DRAWTILE:
 				doDrawTile(args);
 				break;
@@ -421,7 +429,7 @@ public class Client extends Thread {
 		
 		switch (error) {
 			case DECK_EMPTY:
-				((HumanPlayer) game.getLocalPlayer()).tradeFailed(message);
+				game.getLocalPlayer().tradeFailed(message);
 				break;
 			case CHALLENGE_SELF:
 				game.getUI().showMessage("ERROR: Server has sent an invalid message!");
@@ -433,19 +441,19 @@ public class Client extends Thread {
 				game.getUI().showMessage("ERROR: Server has sent an invalid message!");
 				break;
 			case INVALID_COMMAND:
-				//TODO: Implement
+				game.getUI().showMessage("ERROR: Client has sent an invalid command!");
 				break;
 			case INVALID_PARAMETER:
-				//TODO: Implement
+				game.getUI().showMessage("ERROR: Client has sent an invalid command!");
 				break;
 			case MOVE_INVALID:
-				//TODO: Implement
+				game.getLocalPlayer().moveFailed(message);
 				break;
 			case MOVE_TILES_UNOWNED:
-				//TODO: Implement
+				game.getUI().showMessage("ERROR: Player hand is out of sync with server!");
 				break;
 			case NAME_INVALID:
-				//TODO: Implement
+				game.setNameDenied();
 				break;
 			case NAME_USED:
 				game.setNameDenied();
@@ -458,7 +466,7 @@ public class Client extends Thread {
 				game.preGameStop();
 				break;
 			case TRADE_FIRST_TURN:
-				((HumanPlayer) game.getLocalPlayer()).tradeFailed(message);
+				game.getLocalPlayer().tradeFailed(message);
 				break;
 			default:
 				break;

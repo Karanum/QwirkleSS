@@ -312,7 +312,7 @@ public class TUI implements UI {
 					break;
 				case "stop":
 					game.stop(GameEndCause.ERROR);
-					running = false;
+					stop();
 					break;
 				case "help":
 					showHelp();

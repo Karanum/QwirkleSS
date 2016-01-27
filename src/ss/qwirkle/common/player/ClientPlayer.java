@@ -1,5 +1,6 @@
 package ss.qwirkle.common.player;
 
+import ss.qwirkle.common.controller.Game;
 import ss.qwirkle.network.ClientHandler;
 
 /**
@@ -8,6 +9,7 @@ import ss.qwirkle.network.ClientHandler;
  */
 public class ClientPlayer extends Player {
 
+	//@ private invariant handler != null;
 	private ClientHandler handler;
 	
 	/**
@@ -15,9 +17,14 @@ public class ClientPlayer extends Player {
 	 * @param handler The client handler corresponding to the player
 	 * @param name The name of the player
 	 */
-	public ClientPlayer(ClientHandler handler, String name) {
+	//@ requires game != null && handler != null && name != null;
+	public ClientPlayer(Game game, ClientHandler handler, String name) {
 		super(name);
 		this.handler = handler;
+	}
+	
+	public ClientHandler getHandler() {
+		return handler;
 	}
 	
 	/**
@@ -34,6 +41,11 @@ public class ClientPlayer extends Player {
 	//@ requires message != null;
 	@Override
 	public void tradeFailed(String message) {
+		
+	}
+
+	@Override
+	public void moveFailed(String message) {
 		
 	}
 

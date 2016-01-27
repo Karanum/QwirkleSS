@@ -22,7 +22,7 @@ public class AIPlayer extends Player {
 	private SingleplayerGame game;
 	
 	private int tilesToTrade;
-	private List<Tile> tradedTiles;
+	private List<Tile> playedTiles;
 	
 	/**
 	 * Creates a new AI player with the given name and behaviour.
@@ -37,7 +37,7 @@ public class AIPlayer extends Player {
 		behaviour = ai;
 		this.game = game;
 		tilesToTrade = 6;
-		tradedTiles = new ArrayList<Tile>();
+		playedTiles = new ArrayList<Tile>();
 	}
 	
 	/**
@@ -48,6 +48,7 @@ public class AIPlayer extends Player {
 		tilesToTrade = 6;
 		Move move = behaviour.determineMove(game.getBoard(), getHand());
 		if (move.getTiles().size() > 0) {
+			playedTiles = move.getTiles();
 			try {
 				game.doMove(this, move);
 			} catch (InvalidMoveException e) {
@@ -56,10 +57,10 @@ public class AIPlayer extends Player {
 				e.printStackTrace();
 			}
 		} else {
-			tradedTiles = new ArrayList<Tile>(hand);
+			playedTiles = new ArrayList<Tile>(hand);
 			hand.clear();
 			try {
-				game.tradeTiles(this, tradedTiles);
+				game.tradeTiles(this, playedTiles);
 			} catch (MoveOrderException e) {
 				e.printStackTrace();
 			}
@@ -72,21 +73,31 @@ public class AIPlayer extends Player {
 	//@ requires message != null;
 	@Override
 	public void tradeFailed(String message) {
-		hand.addAll(tradedTiles);
+		hand.addAll(playedTiles);
 		
 		--tilesToTrade;
-		tradedTiles = new ArrayList<Tile>(hand);
-		Collections.shuffle(tradedTiles);
-		while (tradedTiles.size() > tilesToTrade) {
-			tradedTiles.remove(0);
+		playedTiles = new ArrayList<Tile>(hand);
+		Collections.shuffle(playedTiles);
+		while (playedTiles.size() > tilesToTrade) {
+			playedTiles.remove(0);
 		}
 		
-		hand.removeAll(tradedTiles);
+		hand.removeAll(playedTiles);
 		try {
-			game.tradeTiles(this, tradedTiles);
+			game.tradeTiles(this, playedTiles);
 		} catch (MoveOrderException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Used by the network client to notify that the player's move failed.
+	 */
+	//@ requires message != null;
+	@Override
+	public void moveFailed(String message) {
+		hand.addAll(playedTiles);
+		determineMove();
 	}
 	
 }

@@ -35,6 +35,12 @@ public abstract class Player {
 	public abstract void tradeFailed(String message);
 	
 	/**
+	 * Used by the network client to notify that the player's move failed.
+	 */
+	//@ requires message != null;
+	public abstract void moveFailed(String message);
+	
+	/**
 	 * Creates a new player with the specified name.
 	 * @param name The name of the new player
 	 */

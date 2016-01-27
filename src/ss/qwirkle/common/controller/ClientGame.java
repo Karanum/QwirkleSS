@@ -110,9 +110,10 @@ public class ClientGame extends Game {
 	/**
 	 * Prepares the game for starting.
 	 * @param newUi The UI to use for this game
-	 * @param client The Client object that is connected to the server
+	 * @param c The Client object that is connected to the server
+	 * @param playerNum The preferred amount of players to play with
 	 */
-	//@ requires newUi != null && client != null;
+	//@ requires newUi != null && c != null;
 	public void setup(UI newUi, Client c, int playerNum) {
 		super.setup(newUi);
 		client = c;
@@ -125,6 +126,20 @@ public class ClientGame extends Game {
 	public void preGameStop() {
 		running = false;
 		dispose();
+		
+	}
+	
+	/**
+	 * Clears up resources at the end of the game and stops the client.
+	 */
+	@Override
+	public void dispose() {
+		super.dispose();
+		if (client.isRunning()) {
+			client.quitPlayer();
+			client.shutdown();
+		}
+		client = null;
 	}
 
 	/**
@@ -145,7 +160,10 @@ public class ClientGame extends Game {
 
 	@Override
 	public void tradeTiles(Player p, List<Tile> tiles) throws MoveOrderException {
-		// TODO Auto-generated method stub
+		if (getCurrentPlayer() != p) {
+			throw new MoveOrderException();
+		}
+		client.tradeMove(tiles);
 	}
 	
 	/**
@@ -159,7 +177,10 @@ public class ClientGame extends Game {
 	//@ requires p != null && move != null;
 	@Override
 	public void doMove(Player p, Move move) throws InvalidMoveException, MoveOrderException {
-		
+		if (getCurrentPlayer() != p) {
+			throw new MoveOrderException();
+		}
+		client.sendMove(move);
 	}
 	
 }
