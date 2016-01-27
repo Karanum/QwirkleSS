@@ -419,7 +419,12 @@ public class Client extends Thread {
 			return;
 		}
 		
-		int errorCode = Integer.parseInt(args[1]);
+		int errorCode;
+		try {
+			errorCode = Integer.parseInt(args[1]);
+		} catch (NumberFormatException e) {
+			errorCode = IProtocol.Error.valueOf(args[1]).ordinal();
+		}
 		String message = args[2];
 		
 		IProtocol.Error error = null;
