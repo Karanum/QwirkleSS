@@ -1,6 +1,6 @@
 package ss.qwirkle.common.ui;
 
-import ss.qwirkle.common.Game;
+import ss.qwirkle.common.controller.SingleplayerGame;
 
 /**
  * UI interface that handles interaction with the user.
@@ -25,6 +25,15 @@ public interface UI extends Runnable {
 	
 	/**
 	 * Shows a game over message with the game results.
+	 * @param cause The cause of the game over
 	 */
-	public void gameOver(Game.GameEndCause cause);
+	//@ requires cause != null;
+	public void gameOver(SingleplayerGame.GameEndCause cause);
+	
+	/**
+	 * Shows a message on the screen.
+	 * @param message The message to show
+	 */
+	//@ requires message != null;
+	public void showMessage(String message);
 }

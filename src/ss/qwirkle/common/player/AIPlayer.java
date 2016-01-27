@@ -1,10 +1,11 @@
 package ss.qwirkle.common.player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import ss.qwirkle.common.Game;
 import ss.qwirkle.common.Move;
+import ss.qwirkle.common.controller.SingleplayerGame;
 import ss.qwirkle.common.player.ai.Behaviour;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.exceptions.InvalidMoveException;
@@ -18,7 +19,10 @@ public class AIPlayer extends Player {
 
 	//@ private invariant behaviour != null;
 	private Behaviour behaviour;
-	private Game game;
+	private SingleplayerGame game;
+	
+	private int tilesToTrade;
+	private List<Tile> tradedTiles;
 	
 	/**
 	 * Creates a new AI player with the given name and behaviour.
@@ -28,10 +32,12 @@ public class AIPlayer extends Player {
 	//@ requires name != null;
 	//@ requires ai != null;
 	//@ requires game != null;
-	public AIPlayer(Game game, String name, Behaviour ai) {
+	public AIPlayer(SingleplayerGame game, String name, Behaviour ai) {
 		super(name);
 		behaviour = ai;
 		this.game = game;
+		tilesToTrade = 6;
+		tradedTiles = new ArrayList<Tile>();
 	}
 	
 	/**
@@ -39,6 +45,7 @@ public class AIPlayer extends Player {
 	 */
 	@Override
 	public void determineMove() {
+		tilesToTrade = 6;
 		Move move = behaviour.determineMove(game.getBoard(), getHand());
 		if (move.getTiles().size() > 0) {
 			try {
@@ -49,13 +56,36 @@ public class AIPlayer extends Player {
 				e.printStackTrace();
 			}
 		} else {
-			List<Tile> tiles = new ArrayList<Tile>(hand);
+			tradedTiles = new ArrayList<Tile>(hand);
 			hand.clear();
 			try {
-				game.tradeTiles(this, tiles);
+				game.tradeTiles(this, tradedTiles);
 			} catch (MoveOrderException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	/**
+	 * Used by the network client to notify that the player's trade failed.
+	 */
+	//@ requires message != null;
+	@Override
+	public void tradeFailed(String message) {
+		hand.addAll(tradedTiles);
+		
+		--tilesToTrade;
+		tradedTiles = new ArrayList<Tile>(hand);
+		Collections.shuffle(tradedTiles);
+		while (tradedTiles.size() > tilesToTrade) {
+			tradedTiles.remove(0);
+		}
+		
+		hand.removeAll(tradedTiles);
+		try {
+			game.tradeTiles(this, tradedTiles);
+		} catch (MoveOrderException e) {
+			e.printStackTrace();
 		}
 	}
 	

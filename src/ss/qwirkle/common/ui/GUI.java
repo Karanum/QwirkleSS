@@ -13,7 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import ss.qwirkle.common.Game.GameEndCause;
+import ss.qwirkle.common.controller.Game.GameEndCause;
 
 /**
  * A quick GUI test.
@@ -120,6 +120,11 @@ public class GUI implements UI, ActionListener {
 
 	@Override
 	public void gameOver(GameEndCause cause) {
+		
+	}
+
+	@Override
+	public void showMessage(String message) {
 		
 	}
 

@@ -3,13 +3,16 @@ package ss.qwirkle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
-import ss.qwirkle.common.Game;
-import ss.qwirkle.common.Game.GameType;
+import ss.qwirkle.common.controller.ClientGame;
+import ss.qwirkle.common.controller.SingleplayerGame;
 import ss.qwirkle.common.player.AIPlayer;
 import ss.qwirkle.common.player.HumanPlayer;
 import ss.qwirkle.common.player.ai.BasicBehaviour;
 import ss.qwirkle.common.ui.TUI;
+import ss.qwirkle.network.Client;
 
 /**
  * Main class for the client-side program.
@@ -44,10 +47,9 @@ public class QwirkleClient {
 	}
 	
 	private static void startSingleplayer(int players) {
-		Game.type = GameType.SINGLEPLAYER;
 		String name = queryName(true);
 		
-		Game game = new Game();
+		SingleplayerGame game = new SingleplayerGame();
 		game.setup(new TUI(game));
 		if (!name.isEmpty()) {
 			game.addPlayer(new HumanPlayer(game, name));
@@ -67,10 +69,29 @@ public class QwirkleClient {
 		game.start();
 	}
 	
-	private static void startClient(int players) {
-		Game.type = GameType.CLIENT;
+	private static void startClient(int players) {		
+		InetAddress hostname;
+		int port;
 		
-		//TODO: Implement client
+		do {
+			hostname = queryServerIP();
+		} while (hostname == null);
+		do {
+			port = queryServerPort();
+		} while (port < 0);
+		
+		ClientGame game = new ClientGame();
+		Client client = new Client(game, hostname, port);
+		if (client != null) {
+			client.start();
+		}
+		game.start();
+		
+		try {
+			client.join();
+		} catch (InterruptedException e) {
+			System.out.println("ERROR: Main thread has been interrupted!");
+		}
 	}
 	
 	private static int queryGameType() {
@@ -133,7 +154,7 @@ public class QwirkleClient {
 		return input.equalsIgnoreCase("y");
 	}
 	
-	private static String queryName(boolean allowAi) {
+	public static String queryName(boolean allowAi) {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		String input = "";
 		
@@ -151,6 +172,47 @@ public class QwirkleClient {
 		}
 		
 		return input;
+	}
+	
+	private static InetAddress queryServerIP() {
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		String input = "";
+		
+		System.out.println("Enter the server hostname:");
+		try {
+			input = in.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			return InetAddress.getByName(input);
+		} catch (UnknownHostException e) {
+			System.out.println("Unknown hostname! Please check your spelling and try again");
+		}
+		
+		return null;
+	}
+	
+	private static int queryServerPort() {
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		String input = "";
+		
+		System.out.println("Enter the server port:");
+		try {
+			input = in.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			int intInput = Integer.parseInt(input); 
+			return intInput;
+		} catch (NumberFormatException e) {
+			System.out.println("Unknown input! Please enter a valid port number!");
+		}
+		
+		return -1;
 	}
 	
 }

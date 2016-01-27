@@ -10,9 +10,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import nl.utwente.ewi.qwirkle.net.IProtocol;
-import ss.qwirkle.common.Game;
 import ss.qwirkle.common.Move;
-import ss.qwirkle.common.Game.GameEndCause;
+import ss.qwirkle.common.controller.SingleplayerGame;
+import ss.qwirkle.common.controller.Game.GameEndCause;
 import ss.qwirkle.common.player.Player;
 import ss.qwirkle.common.tiles.Tile;
 
@@ -78,7 +78,7 @@ public class ClientHandler extends Thread {
     	message += " " + error + " " + msg;
     	send(message);
     }
-    public void winMessage(List<Player> players, Game.GameEndCause cause) {
+    public void winMessage(List<Player> players, SingleplayerGame.GameEndCause cause) {
     	String message = IProtocol.SERVER_GAMEEND + " ";
     	message += cause == GameEndCause.ERROR ? "ERROR" : "WIN";
     	for (Player player : players) {

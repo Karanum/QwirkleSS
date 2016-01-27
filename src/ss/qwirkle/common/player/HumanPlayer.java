@@ -5,8 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import ss.qwirkle.common.Game;
 import ss.qwirkle.common.Move;
+import ss.qwirkle.common.controller.Game;
+import ss.qwirkle.common.controller.SingleplayerGame;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.exceptions.InvalidMoveException;
 import ss.qwirkle.exceptions.MoveOrderException;
@@ -22,6 +23,8 @@ public class HumanPlayer extends Player {
 	private Game game;
 	private boolean awaitingMove;
 	
+	private List<Tile> tradedTiles;
+	
 	/**
 	 * Creates a new human player with the specified name.
 	 * @param name The name of the new player
@@ -35,29 +38,42 @@ public class HumanPlayer extends Player {
 	}
 	
 	public void tradeTiles(List<Tile> tiles) {
-		List<Tile> handCopy = new ArrayList<Tile>(hand);
+		tradedTiles = new ArrayList<Tile>(tiles);
 		hand.removeAll(tiles);
 		try {
 			game.tradeTiles(this, tiles);
 			awaitingMove = false;
 		} catch (MoveOrderException e) {
 			System.out.println("ERROR: Player moved out of turn! Name: " + getName());
-			hand = handCopy;
+			hand.addAll(tradedTiles);
 		}
 	}
 	
 	/**
+	 * Used by the network client to notify that the player's trade failed.
+	 */
+	//@ requires message != null;
+	@Override
+	public void tradeFailed(String message) {
+		hand.addAll(tradedTiles);
+		game.getUI().showMessage(message);
+	}
+	
+	/**
 	 * Asks the player to determine their next move using user input.
+	 * In a singleplayer game, this will pause the game until the move finishes.
 	 */
 	@Override
 	public void determineMove() {
 		move = new Move();
 		awaitingMove = true;
-		while (awaitingMove) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		if (game instanceof SingleplayerGame) {
+			while (awaitingMove) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

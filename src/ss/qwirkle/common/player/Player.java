@@ -29,6 +29,12 @@ public abstract class Player {
 	public abstract void determineMove();
 	
 	/**
+	 * Used by the network client to notify that the player's trade failed.
+	 */
+	//@ requires message != null;
+	public abstract void tradeFailed(String message);
+	
+	/**
 	 * Creates a new player with the specified name.
 	 * @param name The name of the new player
 	 */
@@ -65,6 +71,15 @@ public abstract class Player {
 	//@ ensures points >= 0 ==> getScore() == \old(getScore()) + points;
 	public void addScore(int points) {
 		score += points;
+	}
+	
+	/**
+	 * Forcibly sets the score of the player.
+	 * @param points The amount to set the score to
+	 */
+	//@ ensures getScore() == points;
+	public void setScore(int points) {
+		score = points;
 	}
 	
 	/**

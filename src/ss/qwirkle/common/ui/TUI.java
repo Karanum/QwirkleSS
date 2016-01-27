@@ -8,9 +8,10 @@ import java.util.Collections;
 import java.util.List;
 
 import ss.qwirkle.common.Board;
-import ss.qwirkle.common.Game;
-import ss.qwirkle.common.Game.GameEndCause;
 import ss.qwirkle.common.Move;
+import ss.qwirkle.common.controller.SingleplayerGame;
+import ss.qwirkle.common.controller.Game;
+import ss.qwirkle.common.controller.Game.GameEndCause;
 import ss.qwirkle.common.player.HumanPlayer;
 import ss.qwirkle.common.player.Player;
 import ss.qwirkle.common.player.ai.BasicBehaviour;
@@ -77,8 +78,10 @@ public class TUI implements UI {
 	 * Shows a message that asks for user input.
 	 */
 	private void showCommandPrompt() {
-		if (running) {
-			System.out.println("\nEnter your command (or 'help' for a list of commands):");
+		synchronized (this) {
+			if (running) {
+				System.out.println("\nEnter your command (or 'help' for a list of commands):");
+			}
 		}
 	}
 	
@@ -87,8 +90,10 @@ public class TUI implements UI {
 	 */
 	@Override
 	public void update() {
-		printGame();
-		showCommandPrompt();
+		synchronized (this) {
+			printGame();
+			showCommandPrompt();
+		}
 	}
 	
 	/**
@@ -142,7 +147,10 @@ public class TUI implements UI {
 		if (game.getLocalPlayer() != null) {
 			System.out.println("\n");
 			printScores();
-			System.out.println("\nTiles in bag: " + game.getBag().getSize());
+			if (game instanceof SingleplayerGame) {
+				System.out.println("\nTiles in bag: " + 
+									((SingleplayerGame) game).getBag().getSize());
+			}
 			System.out.println("\n");
 			printHand();
 		}
@@ -155,8 +163,9 @@ public class TUI implements UI {
 		System.out.println("\n");
 		Board board = game.getBoard();
 		Move move = new Move();
-		if (game.getLocalPlayer() != null) {
-			move = game.getLocalPlayer().getCurrentMove().orElse(new Move());
+		if (game.getLocalPlayer() != null && game.getLocalPlayer() instanceof HumanPlayer) {
+			HumanPlayer p = (HumanPlayer) game.getLocalPlayer();
+			move = p.getCurrentMove().orElse(new Move());
 		}
 		Range xRange = new Range(board.getXRange());
 		Range yRange = new Range(board.getYRange());
@@ -240,8 +249,10 @@ public class TUI implements UI {
 	 * Prints the scores of all players on the screen.
 	 */
 	private void printScores() {
-		HumanPlayer localPlayer = game.getLocalPlayer();
-		System.out.println("Your score: " + localPlayer.getScore());
+		Player localPlayer = game.getLocalPlayer();
+		if (game.getLocalPlayer() != null) {
+			System.out.println("Your score: " + localPlayer.getScore());
+		}
 		
 		List<Player> players = game.getPlayers();
 		for (Player player : players) {
@@ -255,7 +266,11 @@ public class TUI implements UI {
 	 * Prints the local player's hand on the screen.
 	 */
 	private void printHand() {
-		HumanPlayer player = game.getLocalPlayer();
+		if (game.getLocalPlayer() == null || !(game.getLocalPlayer() instanceof HumanPlayer)) {
+			return;
+		}
+		
+		HumanPlayer player = (HumanPlayer) game.getLocalPlayer();
 		List<Tile> hand = player.getHand();
 		String delimLine = CORNER;
 		String tileLine = TILE_DELIM;
@@ -309,12 +324,13 @@ public class TUI implements UI {
 	}
 	
 	private void giveHint() {
-		if (game.getLocalPlayer() == null) {
+		if (game.getLocalPlayer() == null || !(game.getLocalPlayer() instanceof HumanPlayer)) {
 			System.out.println("Can only use this when there's a human player!");
 			return;
 		}
 		
-		Move currentMove = game.getLocalPlayer().getCurrentMove().orElse(null);
+		HumanPlayer p = (HumanPlayer) game.getLocalPlayer();
+		Move currentMove = p.getCurrentMove().orElse(null);
 		if (currentMove != null && !currentMove.getTiles().isEmpty()) {
 			System.out.println("I only give hints at the start of your turn!");
 			return;
@@ -346,6 +362,11 @@ public class TUI implements UI {
 	 * Tries to trade tiles by scanning the user input for tile IDs.
 	 */
 	private void tradeTiles(String[] args) {
+		if (game.getLocalPlayer() == null || !(game.getLocalPlayer() instanceof HumanPlayer)) {
+			System.out.println("Can only use this when there's a human player!");
+			return;
+		}
+		
 		if (game.getBoard().isEmpty()) {
 			System.out.println("You may not trade tiles while the board is empty!");
 			return;
@@ -362,15 +383,17 @@ public class TUI implements UI {
 			}
 		}
 		
-		game.getLocalPlayer().tradeTiles(tiles);
+		((HumanPlayer) game.getLocalPlayer()).tradeTiles(tiles);
 	}
 	
 	/**
 	 * Breaks down user input for the MOVE command and executes it.
 	 */
 	//@ requires args != null;
+	//@ requires game.getLocalPlayer() != null && game.getLocalPlayer() instanceof HumanPlayer;
 	private void parsePlaceTile(String[] args) {
-		if (game.getLocalPlayer().getCurrentMove().orElse(null) == null) {
+		HumanPlayer p = (HumanPlayer) game.getLocalPlayer();
+		if (p.getCurrentMove().orElse(null) == null) {
 			System.out.println("It's not your turn yet!");
 			return;
 		}
@@ -406,9 +429,11 @@ public class TUI implements UI {
 	 * @param x The x position on the board
 	 * @param y The y position on the board
 	 */
+	//@ requires game.getLocalPlayer() != null && game.getLocalPlayer() instanceof HumanPlayer;
 	private void placeTile(int handIndex, int x, int y) {
+		HumanPlayer p = (HumanPlayer) game.getLocalPlayer();
 		Board board = game.getBoard();
-		Move move = game.getLocalPlayer().getCurrentMove().orElse(new Move());
+		Move move = p.getCurrentMove().orElse(new Move());
 		Range xRange = new Range(board.getXRange());
 		Range yRange = new Range(board.getYRange());
 		if (!board.isEmpty() || !move.getTiles().isEmpty()) {
@@ -416,7 +441,7 @@ public class TUI implements UI {
 			yRange.setMin(Math.min(yRange.getMin(), move.getYRange().getMin()) - 1);
 		}
 		try {
-			game.getLocalPlayer().makeMove(handIndex - 1, x + xRange.getMin(), y + yRange.getMin());
+			p.makeMove(handIndex - 1, x + xRange.getMin(), y + yRange.getMin());
 			update();
 		} catch (InvalidMoveException e) {
 			System.out.println("That move is not allowed!");
@@ -459,7 +484,13 @@ public class TUI implements UI {
 	 * Tells the local player to end their turn.
 	 */
 	private void endTurn() {
-		Move m = game.getLocalPlayer().getCurrentMove().orElse(null);
+		if (game.getLocalPlayer() == null || !(game.getLocalPlayer() instanceof HumanPlayer)) {
+			System.out.println("Can only use this when there's a human player!");
+			return;
+		}
+		
+		HumanPlayer p = (HumanPlayer) game.getLocalPlayer();
+		Move m = p.getCurrentMove().orElse(null);
 		if (m == null) {
 			System.out.println("It's not your turn yet!");
 			return;
@@ -470,7 +501,7 @@ public class TUI implements UI {
 		}
 		
 		try {
-			game.getLocalPlayer().finishMove();
+			p.finishMove();
 		} catch (InvalidMoveException e) {
 			System.out.println("The move cannot be finished like this!");
 		}
@@ -480,11 +511,17 @@ public class TUI implements UI {
 	 * Tells the local player to discard their current move and start over.
 	 */
 	private void resetMove() {
-		if (game.getLocalPlayer().getCurrentMove().orElse(null) == null) {
+		if (game.getLocalPlayer() == null || !(game.getLocalPlayer() instanceof HumanPlayer)) {
+			System.out.println("Can only use this when there's a human player!");
+			return;
+		}
+		
+		HumanPlayer p = (HumanPlayer) game.getCurrentPlayer();
+		if (p.getCurrentMove().orElse(null) == null) {
 			System.out.println("It's not your turn yet!");
 			return;
 		}
-		game.getLocalPlayer().resetMove();
+		p.resetMove();
 		update();
 	}
 	
@@ -509,29 +546,44 @@ public class TUI implements UI {
 	 */
 	@Override
 	public void gameOver(GameEndCause cause) {
-		System.out.println("\n========== GAME OVER ==========");
-		if (cause == GameEndCause.EMPTY_HAND) {
-			System.out.println("A player was out of tiles! The game has ended!");
-		} else if (cause == GameEndCause.NO_MOVES) {
-			System.out.println("No more moves possible! The game has ended!");
-		} else {
-			System.out.println("The game has been ended prematurely!");
-		}
-		System.out.println("\nScores:");
-		
-		List<Player> players = game.getPlayers();
-		Collections.sort(players, new PlayerScoreComparator());
-		Collections.reverse(players);
-		for (Player p : players) {
-			System.out.println("- " + p.getName() + "'s points: " + p.getScore());
-		}
-		
-		if (cause != GameEndCause.ERROR) {
-			if (players.size() > 1 && players.get(0).getScore() > players.get(1).getScore()) {
-				System.out.println("\nPlayer " + players.get(0).getName() + " has won!");
+		synchronized (this) {
+			System.out.println("\n========== GAME OVER ==========");
+			if (cause == GameEndCause.EMPTY_HAND) {
+				System.out.println("A player was out of tiles! The game has ended!");
+			} else if (cause == GameEndCause.NO_MOVES) {
+				System.out.println("No more moves possible! The game has ended!");
+			} else if (cause == GameEndCause.UNSPECIFIED) {
+				System.out.println("The game has ended!");
 			} else {
-				System.out.println("\nIt's a draw!");
+				System.out.println("The game has been ended prematurely!");
 			}
+			System.out.println("\nScores:");
+			
+			List<Player> players = game.getPlayers();
+			Collections.sort(players, new PlayerScoreComparator());
+			Collections.reverse(players);
+			for (Player p : players) {
+				System.out.println("- " + p.getName() + "'s points: " + p.getScore());
+			}
+			
+			if (cause != GameEndCause.ERROR) {
+				if (players.size() > 1 && players.get(0).getScore() > players.get(1).getScore()) {
+					System.out.println("\nPlayer " + players.get(0).getName() + " has won!");
+				} else {
+					System.out.println("\nIt's a draw!");
+				}
+			}
+		}
+	}
+
+	/**
+	 * Shows a message on the screen.
+	 * @param message The message to show
+	 */
+	@Override
+	public void showMessage(String message) {
+		synchronized (this) {
+			System.out.println(message);
 		}
 	}
 }
