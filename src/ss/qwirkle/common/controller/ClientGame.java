@@ -130,7 +130,6 @@ public class ClientGame extends Game {
 	public void preGameStop() {
 		running = false;
 		dispose();
-		
 	}
 	
 	/**
@@ -173,6 +172,7 @@ public class ClientGame extends Game {
 		if (getCurrentPlayer() == localPlayer) {
 			localPlayer.determineMove();
 		}
+		getUI().update();
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import ss.qwirkle.common.controller.ServerGame;
 import ss.qwirkle.common.ui.UI;
 
 /**
@@ -16,9 +17,11 @@ public class Server {
 
 	//@ private invariant serverUI != null;
 	//@ private invariant threads != null;
+	//@ private invariant games != null;
 	//@ private invariant names != null;
     private UI serverUI;
     private List<ClientHandler> threads;
+    private List<ServerGame> games;
     private List<String> names;
     
     //@ private invariant queue2Players != null;
@@ -41,6 +44,7 @@ public class Server {
         this.port = port;
         serverUI = ui;
         names = new ArrayList<String>();
+        games = new ArrayList<ServerGame>();
         threads = new ArrayList<ClientHandler>();
         queue2Players = new ArrayList<ClientHandler>();
         queue3Players = new ArrayList<ClientHandler>();
@@ -130,14 +134,31 @@ public class Server {
     public void queueClient(ClientHandler handler, List<Integer> queues) {
     	if (queues.contains(2)) {
     		queue2Players.add(handler);
+    		if (queue2Players.size() >= 2) {
+    			startGame(queue2Players, 2);
+    		}
     	}
     	if (queues.contains(3)) {
     		queue3Players.add(handler);
+    		if (queue3Players.size() >= 3) {
+    			startGame(queue3Players, 3);
+    		}
     	}
     	if (queues.contains(4)) {
     		queue4Players.add(handler);
+    		if (queue4Players.size() >= 4) {
+    			startGame(queue4Players, 4);
+    		}
     	}
     	handler.serverQueue(queues);
+    }
+    
+    private void startGame(List<ClientHandler> queue, int players) {
+    	List<ClientHandler> playerList = new ArrayList<ClientHandler>();
+    	for (int i = 0; i < players; ++i) {
+    		playerList.add(queue.remove(0));
+    	}
+    	ServerGame game = new ServerGame(playerList);
     }
     
 }

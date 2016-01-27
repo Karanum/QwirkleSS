@@ -151,6 +151,7 @@ public class TUI implements UI {
 				System.out.println("\nTiles in bag: " + 
 									((SingleplayerGame) game).getBag().getSize());
 			}
+			System.out.println(game.getCurrentPlayer().getName() + "'s turn!");
 			System.out.println("\n");
 			printHand();
 		}
@@ -347,15 +348,6 @@ public class TUI implements UI {
 		int y = tile.getY() - game.getBoard().getYRange().getMin() + 1;
 		String tileString = getTileString(tile);
 		System.out.println("You could place " + tileString + " at " + makeColumn(x - 1) + y);
-		/*
-		 * int firstChar = (i / 26) - 1;
-			int secondChar = i % 26;
-			if (firstChar < 0) {
-				markerLine += " ";
-			} else {
-				markerLine += (char) (firstChar + 65);
-			}
-		 */
 	}
 	
 	/**
