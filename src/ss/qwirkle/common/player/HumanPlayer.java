@@ -44,7 +44,8 @@ public class HumanPlayer extends Player {
 			game.tradeTiles(this, tiles);
 			awaitingMove = false;
 		} catch (MoveOrderException e) {
-			System.out.println("ERROR: Player moved out of turn! Name: " + getName());
+			game.getUI().showMessage("You may only act during your turn!");
+			game.getUI().update();
 			hand.addAll(playedTiles);
 		}
 	}
@@ -57,7 +58,8 @@ public class HumanPlayer extends Player {
 	public void tradeFailed(String message) {
 		hand.addAll(playedTiles);
 		game.getUI().showMessage(message);
-		awaitingMove = true;
+		game.getUI().update();
+		determineMove();
 	}
 	
 	/**
@@ -68,7 +70,8 @@ public class HumanPlayer extends Player {
 	public void moveFailed(String message) {
 		hand.addAll(playedTiles);
 		game.getUI().showMessage(message);
-		awaitingMove = true;
+		game.getUI().update();
+		determineMove();
 	}
 	
 	/**
@@ -135,7 +138,8 @@ public class HumanPlayer extends Player {
 			game.doMove(this, m);
 			awaitingMove = false;
 		} catch (MoveOrderException e) {
-			System.out.println("ERROR: Player moved out of turn! Name: " + getName());
+			game.getUI().showMessage("You may only act during your turn!");
+			game.getUI().update();
 		} catch (InvalidMoveException e) {
 			move = m;
 			throw e;

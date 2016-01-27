@@ -159,6 +159,13 @@ public class Server {
     		playerList.add(queue.remove(0));
     	}
     	ServerGame game = new ServerGame(playerList);
+    	for (ClientHandler p : playerList) {
+    		p.setGame(game);
+    	}
+    	
+    	games.add(game);
+    	game.setup(serverUI);
+    	game.start();
     }
     
 }

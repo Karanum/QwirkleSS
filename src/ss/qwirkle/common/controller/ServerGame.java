@@ -49,10 +49,8 @@ public class ServerGame extends Game {
 		getBoard().doMove(move);
 		p.addScore(move.getPoints());
 		
-		if (p instanceof ClientPlayer) {
-			//((ClientPlayer) p).getHandler();
-			//TODO: Send out move
-		}
+		//((ClientPlayer) p).getHandler();
+		//TODO: Send out move
 	}
 
 }

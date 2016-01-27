@@ -264,6 +264,7 @@ public class Client extends Thread {
 	private void endGame(String[] args) {
 		if (args.length < 2 + game.getPlayers().size()) {
 			game.getUI().showMessage("ERROR: Server has sent an invalid message!");
+			game.getUI().update();
 			return;
 		}
 		
@@ -288,16 +289,18 @@ public class Client extends Thread {
 	private void showPassMessage(String[] args) {
 		if (args.length < 2) {
 			game.getUI().showMessage("ERROR: Server has sent an invalid message!");
+			game.getUI().update();
 			return;
 		}
 		game.getUI().showMessage("Player " + args[1] + " could not make a move and was skipped!");
+		game.getUI().update();
 	}
 	
 	/**
 	 * Command executor for SERVER_QUEUE.
 	 */
 	private void confirmQueue() {
-		game.getUI().showMessage("You have been queued! Waiting for a match...");
+		System.out.println("You have been queued! Waiting for a match...");
 	}
 	
 	/**
@@ -314,6 +317,7 @@ public class Client extends Thread {
 	private void doServerTurn(String[] args) {
 		if (args.length < 2) {
 			game.getUI().showMessage("ERROR: Server has sent an invalid message!");
+			game.getUI().update();
 			return;
 		}
 		game.setCurrentPlayer(args[1]);
@@ -325,6 +329,7 @@ public class Client extends Thread {
 	private void doGameStart(String[] args) {
 		if (args.length < 3) {
 			game.getUI().showMessage("ERROR: Server has sent an invalid message!");
+			game.getUI().update();
 			return;
 		}
 		
@@ -335,9 +340,8 @@ public class Client extends Thread {
 			}
 		}
 		
-		game.getUI().showMessage("A match was found! Starting game now...");
+		System.out.println("A match was found! Starting game now...");
 		(new Thread(game.getUI())).start();
-		game.getUI().update();
 	}
 	
 	/**
@@ -346,6 +350,7 @@ public class Client extends Thread {
 	private void doMovePut(String[] args) {
 		if (args.length < 2) {
 			game.getUI().showMessage("ERROR: Server has sent an invalid message!");
+			game.getUI().update();
 			return;
 		}
 		
@@ -363,6 +368,7 @@ public class Client extends Thread {
 					move.addTile(game.getBoard(), tile, x, y);
 				} catch (InvalidMoveException e) {
 					game.getUI().showMessage("ERROR: Server permitted a move that's not allowed!");
+					game.getUI().update();
 				}
 			}
 		}
@@ -372,6 +378,7 @@ public class Client extends Thread {
 			game.getUI().update();
 		} catch (InvalidMoveException e) {
 			game.getUI().showMessage("ERROR: Server permitted a move that's not allowed!");
+			game.getUI().update();
 		} catch (MoveOrderException e) { }
 	}
 	
@@ -381,6 +388,7 @@ public class Client extends Thread {
 	private void doMoveTrade(String[] args) {
 		if (args.length < 2) {
 			game.getUI().showMessage("ERROR: Server has sent an invalid message!");
+			game.getUI().update();
 			return;
 		}
 		
@@ -388,6 +396,7 @@ public class Client extends Thread {
 		if (p != game.getLocalPlayer()) {
 			game.getUI().showMessage("Player " + p.getName() + " just traded " 
 										+ args[1] + "tiles");
+			game.getUI().update();
 		}
 	}
 	
@@ -397,12 +406,12 @@ public class Client extends Thread {
 	private void doDrawTile(String[] args) {
 		if (args.length < 2) {
 			game.getUI().showMessage("ERROR: Server has sent an invalid message!");
+			game.getUI().update();
 			return;
 		}
 		
 		List<Tile> tiles = new ArrayList<Tile>();
 		for (int i = 1; i < args.length; ++i) {
-			System.out.println("Got tile: " + args[i]);
 			int tileInt = Integer.parseInt(args[i]);
 			tiles.add(new Tile(tileInt));
 		}
@@ -414,8 +423,9 @@ public class Client extends Thread {
 	 * Delegation command for the different errors the server can throw.
 	 */
 	private void handleError(String[] args) {
-		if (args.length < 3) {
+		if (args.length < 2) {
 			game.getUI().showMessage("ERROR: Server has sent an invalid message!");
+			game.getUI().update();
 			return;
 		}
 		
@@ -425,7 +435,8 @@ public class Client extends Thread {
 		} catch (NumberFormatException e) {
 			errorCode = IProtocol.Error.valueOf(args[1]).ordinal();
 		}
-		String message = args[2];
+		String message;
+		message = args.length >= 3 ? args[2] : "?";
 		
 		IProtocol.Error error = null;
 		for (IProtocol.Error e : IProtocol.Error.values()) {
@@ -436,6 +447,7 @@ public class Client extends Thread {
 		}
 		if (error == null) {
 			game.getUI().showMessage("ERROR: Server has sent an unknown error code");
+			game.getUI().update();
 			return;
 		}
 		
@@ -445,24 +457,30 @@ public class Client extends Thread {
 				break;
 			case CHALLENGE_SELF:
 				game.getUI().showMessage("ERROR: Server has sent an invalid message!");
+				game.getUI().update();
 				break;
 			case ILLEGAL_STATE:
 				game.getUI().showMessage("ERROR: Something just happened out of turn!");
+				game.getUI().update();
 				break;
 			case INVALID_CHANNEL:
 				game.getUI().showMessage("ERROR: Server has sent an invalid message!");
+				game.getUI().update();
 				break;
 			case INVALID_COMMAND:
 				game.getUI().showMessage("ERROR: Client has sent an invalid command!");
+				game.getUI().update();
 				break;
 			case INVALID_PARAMETER:
 				game.getUI().showMessage("ERROR: Client has sent an invalid command!");
+				game.getUI().update();
 				break;
 			case MOVE_INVALID:
 				game.getLocalPlayer().moveFailed(message);
 				break;
 			case MOVE_TILES_UNOWNED:
 				game.getUI().showMessage("ERROR: Player hand is out of sync with server!");
+				game.getUI().update();
 				break;
 			case NAME_INVALID:
 				game.setNameDenied();
@@ -472,6 +490,7 @@ public class Client extends Thread {
 				break;
 			case NOT_CHALLENGED:
 				game.getUI().showMessage("ERROR: Server has sent an invalid message!");
+				game.getUI().update();
 				break;
 			case QUEUE_INVALID:
 				game.getUI().showMessage(message);

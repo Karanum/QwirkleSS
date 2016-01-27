@@ -3,13 +3,13 @@ package ss.qwirkle.common.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.utwente.ewi.qwirkle.net.IProtocol;
 import nl.utwente.ewi.qwirkle.net.IProtocol.Feature;
 import ss.qwirkle.QwirkleClient;
-import ss.qwirkle.common.BoardChecker;
 import ss.qwirkle.common.Move;
+import ss.qwirkle.common.player.AIPlayer;
 import ss.qwirkle.common.player.HumanPlayer;
 import ss.qwirkle.common.player.Player;
+import ss.qwirkle.common.player.ai.BasicBehaviour;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.common.ui.UI;
 import ss.qwirkle.exceptions.InvalidMoveException;
@@ -41,9 +41,15 @@ public class ClientGame extends Game {
 			return;
 		}
 		while (localPlayer == null) {
-			String name = queryName();
+			String name = queryName();			
 			response = false;
-			client.identifyPlayer(name, new ArrayList<Feature>());
+			
+			if (name.startsWith("AI:")) {
+				client.identifyPlayer(name.substring(3), new ArrayList<Feature>());
+			} else {
+				client.identifyPlayer(name, new ArrayList<Feature>());
+			}
+			
 			while (!response) {
 				while (!client.hasNext()) {
 					try {
@@ -53,8 +59,14 @@ public class ClientGame extends Game {
 				
 				client.parseCommand(client.next());
 				if (nameAccepted) {
-					localPlayer = new HumanPlayer(this, name);
+					if (name.startsWith("AI:")) {
+						name = name.substring(3);
+						localPlayer = new AIPlayer(this, name, new BasicBehaviour());
+					} else {
+						localPlayer = new HumanPlayer(this, name);
+					}
 					addPlayer(localPlayer);
+					
 				} else {
 					System.out.println("That name has already been taken!");
 				}
@@ -102,9 +114,10 @@ public class ClientGame extends Game {
 		String name = null;
 		while (name == null) {
 			name = QwirkleClient.queryName(false);
-			if (!name.matches(IProtocol.NAME_REGEX)) {
+			String pattern = "^(AI:)?[A-Za-z0-9-_]{2,16}$";
+			if (!name.matches(pattern)) {
 				name = null;
-				getUI().showMessage("Please enter a name between 2 and 16 characters "
+				System.out.println("Please enter a name between 2 and 16 characters "
 									+ "consisting only of letters, digits and underscores");
 			}
 		}

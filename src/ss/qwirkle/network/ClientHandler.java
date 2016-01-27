@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import nl.utwente.ewi.qwirkle.net.IProtocol;
 import nl.utwente.ewi.qwirkle.net.IProtocol.Feature;
@@ -18,6 +20,8 @@ import ss.qwirkle.common.controller.Game.GameEndCause;
 import ss.qwirkle.common.controller.ServerGame;
 import ss.qwirkle.common.player.Player;
 import ss.qwirkle.common.tiles.Tile;
+import ss.qwirkle.exceptions.InvalidMoveException;
+import ss.qwirkle.exceptions.MoveOrderException;
 
 public class ClientHandler extends Thread {
 	
@@ -60,6 +64,10 @@ public class ClientHandler extends Thread {
     	return clientName;
     }
     
+    public void setGame(ServerGame game) {
+    	this.game = game;
+    }
+    
     public void sendMessage(String message) {
         try {
         	out.write(message);
@@ -98,8 +106,8 @@ public class ClientHandler extends Thread {
 		for (Tile t : m.getTiles()) {
 			message += String.format(" %d@%d,%d", t.toInt(), t.getX(), t.getY());
 		}
-		send(message);
-    } //TODO: Call this function
+		server.broadcast(message);
+    }
     
     public void sendError(IProtocol.Error error, String msg) {
     	String message = IProtocol.SERVER_ERROR;
@@ -184,15 +192,19 @@ public class ClientHandler extends Thread {
 		String[] args = message.split(" ");
 		switch (args[0]) {
 			case IProtocol.CLIENT_MOVE_PUT:
+				doMovePut(args);
 				break;
 			case IProtocol.CLIENT_IDENTIFY:
 				identifyPlayer(args);
 				break;
 			case IProtocol.CLIENT_MOVE_TRADE:
+				//TODO: Implement
 				break;
 			case IProtocol.CLIENT_QUIT:
+				//TODO: Implement
 				break;
 			case IProtocol.SERVER_QUEUE:
+				//TODO: Implement
 				break;
 		}
 	}
@@ -219,5 +231,43 @@ public class ClientHandler extends Thread {
     	clientName = name;
     	server.registerName(name);
     	identifyPlayer(new ArrayList<Feature>());
+    }
+    
+    /**
+     * Command executor for CLIENT_MOVE_PUT.
+     */
+    private void doMovePut(String[] args) {
+    	if (args.length < 2) {
+    		sendError(IProtocol.Error.INVALID_PARAMETER, "Missing parameter");
+			return;
+		}
+		
+		Move move = new Move();
+		Pattern pattern = Pattern.compile("(\\d+)@(-?\\d+),(-?\\d+)");
+		for (int i = 1; i < args.length; ++i) {
+			String tileString = args[i];
+			Matcher match = pattern.matcher(tileString);
+			if (match.matches()) {
+				int tileId = Integer.parseInt(match.group(1));
+				int x = Integer.parseInt(match.group(2));
+				int y = Integer.parseInt(match.group(3));
+				Tile tile = new Tile(tileId);
+				try {
+					move.addTile(game.getBoard(), tile, x, y);
+				} catch (InvalidMoveException e) {
+					sendError(IProtocol.Error.MOVE_INVALID, "Invalid move");
+					return;
+				}
+			}
+		}
+		
+		try {
+			game.doMove(game.getPlayerByName(clientName).orElse(null), move);
+			putMove(move);
+		} catch (InvalidMoveException e) {
+			sendError(IProtocol.Error.MOVE_INVALID, "Invalid move");
+		} catch (MoveOrderException e) { 
+			sendError(IProtocol.Error.ILLEGAL_STATE, "Acted out of turn");
+		}
     }
 }

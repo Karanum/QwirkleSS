@@ -40,6 +40,7 @@ public class TUI implements UI {
 	private Game game;
 	private boolean running;
 	private BufferedReader in;
+	private List<String> queuedMessages;
 	
 	/**
 	 * Creates a new TUI object with reference to the Game.
@@ -49,6 +50,7 @@ public class TUI implements UI {
 		this.game = game;
 		running = true;
 		in = new BufferedReader(new InputStreamReader(System.in));
+		queuedMessages = new ArrayList<String>();
 		
 		System.out.println("=-=-= Qwirkle TUI =-=-=");
 	}
@@ -151,8 +153,15 @@ public class TUI implements UI {
 				System.out.println("\nTiles in bag: " + 
 									((SingleplayerGame) game).getBag().getSize());
 			}
-			System.out.println(game.getCurrentPlayer().getName() + "'s turn!");
-			System.out.println("\n");
+			System.out.println("");
+			
+			List<String> messages = new ArrayList<String>(queuedMessages);
+			queuedMessages.clear();
+			for (String message : messages) {
+				System.out.println(message);
+			}
+			
+			System.out.println("");
 			printHand();
 		}
 	}
@@ -508,7 +517,7 @@ public class TUI implements UI {
 			return;
 		}
 		
-		HumanPlayer p = (HumanPlayer) game.getCurrentPlayer();
+		HumanPlayer p = (HumanPlayer) game.getLocalPlayer();
 		if (p.getCurrentMove().orElse(null) == null) {
 			System.out.println("It's not your turn yet!");
 			return;
@@ -575,7 +584,7 @@ public class TUI implements UI {
 	@Override
 	public void showMessage(String message) {
 		synchronized (this) {
-			System.out.println(message);
+			queuedMessages.add(message);
 		}
 	}
 }

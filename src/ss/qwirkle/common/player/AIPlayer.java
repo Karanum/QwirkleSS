@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ss.qwirkle.common.Move;
-import ss.qwirkle.common.controller.SingleplayerGame;
+import ss.qwirkle.common.controller.Game;
 import ss.qwirkle.common.player.ai.Behaviour;
 import ss.qwirkle.common.tiles.Tile;
 import ss.qwirkle.exceptions.InvalidMoveException;
@@ -19,7 +19,7 @@ public class AIPlayer extends Player {
 
 	//@ private invariant behaviour != null;
 	private Behaviour behaviour;
-	private SingleplayerGame game;
+	private Game game;
 	
 	private int tilesToTrade;
 	private List<Tile> playedTiles;
@@ -32,7 +32,7 @@ public class AIPlayer extends Player {
 	//@ requires name != null;
 	//@ requires ai != null;
 	//@ requires game != null;
-	public AIPlayer(SingleplayerGame game, String name, Behaviour ai) {
+	public AIPlayer(Game game, String name, Behaviour ai) {
 		super(name);
 		behaviour = ai;
 		this.game = game;
