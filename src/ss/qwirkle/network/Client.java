@@ -184,12 +184,15 @@ public class Client extends Thread {
 	//@ requires name != null && features != null;
 	public void identifyPlayer(String name, List<IProtocol.Feature> features) {
 		String message = IProtocol.CLIENT_IDENTIFY;
-		message += " " + name + " ";
-		Iterator<IProtocol.Feature> iterator = features.iterator();
-		while (iterator.hasNext()) {
-			message += iterator.next();
-			if (iterator.hasNext()) {
-				message += ",";
+		message += " " + name;
+		if (!features.isEmpty()) {
+			message += " ";
+			Iterator<IProtocol.Feature> iterator = features.iterator();
+			while (iterator.hasNext()) {
+				message += iterator.next();
+				if (iterator.hasNext()) {
+					message += ",";
+				}
 			}
 		}
 		sendMessage(message);

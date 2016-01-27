@@ -44,16 +44,19 @@ public class ClientGame extends Game {
 			response = false;
 			client.identifyPlayer(name, new ArrayList<Feature>());
 			while (!response) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) { }
-			}
-			
-			if (nameAccepted) {
-				localPlayer = new HumanPlayer(this, name);
-				addPlayer(localPlayer);
-			} else {
-				System.out.println("That name has already been taken!");
+				while (!client.hasNext()) {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) { }
+				}
+				
+				client.parseCommand(client.next());
+				if (nameAccepted) {
+					localPlayer = new HumanPlayer(this, name);
+					addPlayer(localPlayer);
+				} else {
+					System.out.println("That name has already been taken!");
+				}
 			}
 		}
 		
@@ -80,7 +83,7 @@ public class ClientGame extends Game {
 	 */
 	public void setNameDenied() {
 		response = true;
-		nameAccepted = true;
+		nameAccepted = false;
 	}
 	
 	/**
@@ -88,7 +91,7 @@ public class ClientGame extends Game {
 	 */
 	public void setNameAccepted() {
 		response = true;
-		nameAccepted = false;
+		nameAccepted = true;
 	}
 	
 	/**
