@@ -81,6 +81,7 @@ public class Client extends Thread {
 			out.write(message);
 			out.newLine();
 			out.flush();
+			System.out.println("[OUT] " + message);
 		} catch (IOException e) {
 			System.out.println("Connection has been lost.");
 			shutdown();
@@ -112,6 +113,7 @@ public class Client extends Thread {
 			try {
 				while (in.ready()) {
 					String input = in.readLine();
+					System.out.println("[IN] " + input);
 					buffer.add(input);
 				}
 			} catch (IOException e) {
@@ -182,7 +184,7 @@ public class Client extends Thread {
 	//@ requires name != null && features != null;
 	public void identifyPlayer(String name, List<IProtocol.Feature> features) {
 		String message = IProtocol.CLIENT_IDENTIFY;
-		message += " ";
+		message += " " + name + " ";
 		Iterator<IProtocol.Feature> iterator = features.iterator();
 		while (iterator.hasNext()) {
 			message += iterator.next();
